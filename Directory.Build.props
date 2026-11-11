@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <RootNamespace>HomeTracker.$(MSBuildProjectName)</RootNamespace>
+    <AssemblyName>HomeTracker.$(MSBuildProjectName)</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>SaiSanthosh97</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>

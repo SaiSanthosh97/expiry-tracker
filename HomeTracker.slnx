@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Apps/">
+    <Project Path="src/Apps/ExpiryTracker.App/ExpiryTracker.App.csproj" />
+  </Folder>
+  <Folder Name="/Components/">
+    <Project Path="src/Components/Core.DateExtraction/Core.DateExtraction.csproj" />
+    <Project Path="src/Components/Core.ExpiryEngine/Core.ExpiryEngine.csproj" />
+    <Project Path="src/Components/Core.ShelfLife/Core.ShelfLife.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Core.DateExtraction.Tests/Core.DateExtraction.Tests.csproj" />
+    <Project Path="tests/Core.ExpiryEngine.Tests/Core.ExpiryEngine.Tests.csproj" />
+    <Project Path="tests/Core.ShelfLife.Tests/Core.ShelfLife.Tests.csproj" />
+  </Folder>
+</Solution>
