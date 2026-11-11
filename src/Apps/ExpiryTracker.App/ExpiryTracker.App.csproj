@@ -31,8 +31,8 @@
 		<!-- Versions -->
 		<!-- ApplicationDisplayVersion must match the GitHub release tag (v0.1.0) for update checks.
 		     ApplicationVersion must go up by one with every release. -->
-		<ApplicationDisplayVersion>0.1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
+		<ApplicationVersion>2</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
@@ -57,11 +57,7 @@
 		<MauiImage Include="Resources\Images\*" />
 
 		<!-- UI text. Translations go in AppResources.<language>.resx (e.g. AppResources.hi.resx). -->
-		<EmbeddedResource Update="Resources\Strings\AppResources.resx"
-		                  StronglyTypedLanguage="CSharp"
-		                  StronglyTypedClassName="AppResources"
-		                  StronglyTypedNamespace="ExpiryTracker.App.Resources.Strings"
-		                  StronglyTypedFileName="$(IntermediateOutputPath)AppResources.Designer.cs" />
+		<EmbeddedResource Update="Resources\Strings\AppResources.resx" StronglyTypedLanguage="CSharp" StronglyTypedClassName="AppResources" StronglyTypedNamespace="ExpiryTracker.App.Resources.Strings" StronglyTypedFileName="$(IntermediateOutputPath)AppResources.Designer.cs" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
@@ -84,6 +80,9 @@
 	  <ProjectReference Include="..\..\Components\Storage.Sqlite\Storage.Sqlite.csproj" />
 	  <ProjectReference Include="..\..\Components\Core.AppUpdater\Core.AppUpdater.csproj" />
 	  <ProjectReference Include="..\..\Components\Device.Reminders\Device.Reminders.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.LabelCapture\Core.LabelCapture.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.ProductCatalog\Core.ProductCatalog.csproj" />
+	  <ProjectReference Include="..\..\Components\Device.Vision\Device.Vision.csproj" />
 	</ItemGroup>
 
 </Project>

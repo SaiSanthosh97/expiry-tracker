@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core.LabelCapture\Core.LabelCapture.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xamarin.Google.MLKit.BarcodeScanning" Version="117.3.0.5" />
+    <PackageReference Include="Xamarin.Google.MLKit.TextRecognition" Version="116.0.1.5" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- On-device barcode and text reading from photos. Android (Google ML Kit) now; Windows later. -->
+    <TargetFrameworks>net10.0-android</TargetFrameworks>
+    <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

@@ -20,6 +20,9 @@ public sealed record TrackedItem
 
     public int Quantity { get; init; } = 1;
 
+    /// <summary>Product barcode (EAN/UPC), when scanned. Lets the household's own history name the product next time.</summary>
+    public string? Barcode { get; init; }
+
     public DateOnly AddedDate { get; init; }
 
     /// <summary>Printed expiry, already resolved to its last usable day.</summary>

@@ -11,6 +11,18 @@ Dependencies shipped in the app, with their licenses. Checked at every release.
 | SQLitePCLRaw.core, SQLitePCLRaw.provider.e_sqlite3 | Storage.Sqlite | Apache-2.0 |
 | SourceGear.sqlite3 (native SQLite builds) | Storage.Sqlite | SQLite: public domain |
 | Open Sans font | App | SIL Open Font License 1.1 |
+| Google ML Kit barcode scanning and text recognition (on-device models) | Device.Vision | Free to use under the [ML Kit Terms of Service](https://developers.google.com/ml-kit/terms); closed source |
+| Google Play services client libraries (used by ML Kit) | Device.Vision | [Android Software Development Kit License](https://developer.android.com/studio/terms) |
+| .NET bindings for ML Kit and Play services (Xamarin.Google.MLKit.*, Xamarin.GooglePlayServices.*) by Microsoft | Device.Vision | MIT |
+
+## Data
+
+| Source | Used for | License / terms |
+|---|---|---|
+| [Open Food Facts](https://world.openfoodfacts.org) | Product names and categories when a barcode is scanned (only the barcode number is sent) | Database: [Open Database License](https://opendatacommons.org/licenses/odbl/1-0/); the app shows "Product details from Open Food Facts" when it uses their data and does not copy their database |
+
+ML Kit packages are pinned to `Xamarin.Google.MLKit.BarcodeScanning` 117.3.0.5 and `Xamarin.Google.MLKit.TextRecognition`
+116.0.1.5: newer ones need AndroidX libraries newer than the ones .NET MAUI 10 requires, and fail to restore.
 
 Do not add `SQLitePCLRaw.bundle_green` or the 2.x `SQLitePCLRaw.lib.e_sqlite3` packages: 2.1.11 has a known
 high-severity vulnerability (GHSA-2m69-gcr7-jv3q), and the 2.x native package contains only desktop builds,

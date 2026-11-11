@@ -38,13 +38,17 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
 
     private readonly ItemService _items;
     private readonly Dialogs _dialogs;
+    private readonly ScanService _scan;
     private TrackedItem? _editing;
     private bool _loading;
+    private string? _barcode;
+    private ShelfLifeDuration? _afterOpeningFromLabel;
 
-    public AddItemViewModel(ItemService items, ShelfLifeCatalog catalog, Dialogs dialogs)
+    public AddItemViewModel(ItemService items, ShelfLifeCatalog catalog, Dialogs dialogs, ScanService scan)
     {
         _items = items;
         _dialogs = dialogs;
+        _scan = scan;
 
         Categories = new ObservableCollection<CategoryChip>(
             DefaultPresets.All.Select(p => catalog.Find(p.Id) ?? p).Select(c => new CategoryChip(c)));
@@ -74,6 +78,16 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
 
     [ObservableProperty]
     public partial string Name { get; set; } = "";
+
+    /// <summary>Shown under the name after a barcode scan: where the name came from, or why it wasn't found.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasScanNote))]
+    public partial string? ScanNote { get; set; }
+
+    public bool HasScanNote => !string.IsNullOrEmpty(ScanNote);
+
+    [ObservableProperty]
+    public partial bool IsBusy { get; set; }
 
     // Exactly one of the three date modes is on; RadioButtons bind to these.
     [ObservableProperty]
@@ -140,6 +154,7 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
         _loading = true;
         var item = evaluation.Item;
         _editing = item;
+        _barcode = item.Barcode;
         Title = AppResources.Edit_Title;
         Name = item.Name;
         Quantity = item.Quantity;
@@ -150,18 +165,11 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
 
         if (item.PrintedExpiry is { } printed)
         {
-            SetMode(pack: true);
-            HasDay = printed.Day != DateTime.DaysInMonth(printed.Year, printed.Month);
-            DayIndex = printed.Day - 1;
-            MonthIndex = printed.Month - 1;
-            YearIndex = Math.Max(0, Years.ToList().IndexOf(printed.Year));
+            SetPackDate(printed, hasDay: printed.Day != DateTime.DaysInMonth(printed.Year, printed.Month));
         }
         else if (item is { ManufactureDate: { } made, BestBeforeFromManufacture: { Unit: ShelfLifeUnit.Months } bestBefore })
         {
-            SetMode(made: true);
-            MadeMonthIndex = made.Month - 1;
-            MadeYearIndex = Math.Max(0, Years.ToList().IndexOf(made.Year));
-            GoodForMonths = bestBefore.Amount;
+            SetMadeDate(made, bestBefore.Amount);
         }
         else if (item.ShelfLifeFromAdded is { } shelfLife)
         {
@@ -182,6 +190,37 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
         YearIndex = -1;
         MadeMonthIndex = -1;
         MadeYearIndex = -1;
+    }
+
+    /// <summary>Fills the "expiry on the pack" pickers. A year outside the list stays empty, so Save asks for it.</summary>
+    private void SetPackDate(DateOnly date, bool hasDay)
+    {
+        SetMode(pack: true);
+        HasDay = hasDay;
+        DayIndex = date.Day - 1;
+        MonthIndex = date.Month - 1;
+        YearIndex = IndexOfYear(date.Year);
+    }
+
+    private void SetMadeDate(DateOnly made, int goodForMonths)
+    {
+        SetMode(made: true);
+        MadeMonthIndex = made.Month - 1;
+        MadeYearIndex = IndexOfYear(made.Year);
+        GoodForMonths = goodForMonths;
+    }
+
+    private int IndexOfYear(int year)
+    {
+        for (var i = 0; i < Years.Count; i++)
+        {
+            if (Years[i] == year)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private bool IsDateMissing =>
@@ -288,6 +327,8 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
             Name = name,
             CategoryId = category.Id,
             Quantity = Quantity,
+            Barcode = _barcode,
+            AfterOpening = _afterOpeningFromLabel ?? _editing?.AfterOpening,
             PrintedExpiry = null,
             ManufactureDate = null,
             BestBeforeFromManufacture = null,
@@ -336,5 +377,105 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
 
         await _items.SaveAsync(BuildItem());
         await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private async Task ScanBarcodeAsync()
+    {
+        var photo = await _scan.GetPhotoAsync(AppResources.Scan_BarcodeTitle);
+        if (photo is null)
+        {
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            var code = await _scan.ReadBarcodeAsync(photo);
+            if (code is null)
+            {
+                IsBusy = false;
+                await _dialogs.AlertAsync(AppResources.Scan_BarcodeTitle, AppResources.Scan_NoBarcode);
+                return;
+            }
+
+            _barcode = code;
+            var result = await _scan.LookupAsync(code);
+            IsBusy = false;
+
+            if (result.Product is not { } product)
+            {
+                ScanNote = result.SomeSourcesUnavailable ? AppResources.Scan_Offline : AppResources.Scan_ProductNotFound;
+                return;
+            }
+
+            Name = product.Name;
+            ScanNote = product.Source == HomeTracker.Core.ProductCatalog.ProductSource.OpenFoodFacts
+                ? AppResources.Scan_FromOpenFoodFacts
+                : AppResources.Scan_Remembered;
+
+            if (product.CategoryId is { } categoryId && Categories.FirstOrDefault(c => c.Category.Id == categoryId) is { } chip)
+            {
+                // Don't let the category's defaults overwrite a date the user already set or scanned.
+                var noDateChosenYet = MonthIndex < 0 && MadeMonthIndex < 0;
+                SelectCategory(chip, applyDefaults: _editing is null && noDateChosenYet);
+            }
+        }
+        finally
+        {
+            IsBusy = false;
+            ScanService.Discard(photo);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ReadDateAsync()
+    {
+        var photo = await _scan.GetPhotoAsync(AppResources.Scan_DateTitle);
+        if (photo is null)
+        {
+            return;
+        }
+
+        HomeTracker.Core.DateExtraction.LabelDateResult dates;
+        try
+        {
+            IsBusy = true;
+            dates = (await _scan.ReadDatesAsync(photo)).Dates;
+        }
+        finally
+        {
+            IsBusy = false;
+            ScanService.Discard(photo);
+        }
+
+        if (dates.ExpiryLastUsableDay is not { } last || IndexOfYear(last.Year) < 0)
+        {
+            await _dialogs.AlertAsync(AppResources.Scan_DateTitle, AppResources.Scan_NoDate);
+            return;
+        }
+
+        // Camera reading can be wrong: the user always confirms before the date is used.
+        var confirmed = await _dialogs.ConfirmAsync(
+            AppResources.Scan_DateTitle,
+            string.Format(AppResources.Scan_DateConfirm, Text.Date(last)),
+            AppResources.Scan_Yes,
+            AppResources.Scan_No);
+        if (!confirmed)
+        {
+            return;
+        }
+
+        _afterOpeningFromLabel = dates.AfterOpening;
+        if (dates is { Expiry: null, Manufacture: { } made, BestBeforeFromManufacture: { Unit: ShelfLifeUnit.Months } bestBefore }
+            && bestBefore.LastUsableDay(made.Date) == last)
+        {
+            SetMadeDate(made.Date, bestBefore.Amount);
+        }
+        else
+        {
+            SetPackDate(last, hasDay: dates.Expiry?.Precision == HomeTracker.Core.DateExtraction.DatePrecision.Day
+                || last.Day != DateTime.DaysInMonth(last.Year, last.Month));
+        }
     }
 }

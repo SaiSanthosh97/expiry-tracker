@@ -17,6 +17,10 @@ internal sealed class ItemRow
 
     public int Quantity { get; set; }
 
+    // New columns are added to existing databases automatically by sqlite-net (CreateTable migrates).
+    [Indexed]
+    public string? Barcode { get; set; }
+
     public int AddedDate { get; set; }
 
     public int? PrintedExpiry { get; set; }
@@ -58,6 +62,7 @@ internal sealed class ItemRow
         Name = item.Name,
         CategoryId = item.CategoryId,
         Quantity = item.Quantity,
+        Barcode = item.Barcode,
         AddedDate = item.AddedDate.DayNumber,
         PrintedExpiry = item.PrintedExpiry?.DayNumber,
         ManufactureDate = item.ManufactureDate?.DayNumber,
@@ -83,6 +88,7 @@ internal sealed class ItemRow
         Name = Name,
         CategoryId = CategoryId,
         Quantity = Quantity,
+        Barcode = Barcode,
         AddedDate = DateOnly.FromDayNumber(AddedDate),
         PrintedExpiry = ToDate(PrintedExpiry),
         ManufactureDate = ToDate(ManufactureDate),

@@ -120,7 +120,7 @@
   <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates. Check your internet connection.</value></data>
   <data name="Settings_About" xml:space="preserve"><value>About</value></data>
   <data name="About_Disclaimer" xml:space="preserve"><value>Home Tracker only reminds you about dates that you or the pack provide. It does not give medical or food-safety advice. Always follow the label and your doctor or pharmacist.</value></data>
-  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Nothing is uploaded. The app only contacts GitHub on Wi-Fi to check for updates.</value></data>
+  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone and not kept. When you scan a barcode, only the barcode number is sent to Open Food Facts to find the product name. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
   <data name="About_License" xml:space="preserve"><value>Free and open source (MIT License).</value></data>
   <data name="About_SourceCode" xml:space="preserve"><value>Source code on GitHub</value></data>
   <data name="Reminder_Channel" xml:space="preserve"><value>Expiry reminders</value></data>
@@ -134,4 +134,22 @@
   <data name="Welcome_Title" xml:space="preserve"><value>Welcome to Home Tracker</value></data>
   <data name="Welcome_Continue" xml:space="preserve"><value>Continue</value></data>
   <data name="Notifications_Denied" xml:space="preserve"><value>Without notifications the app can&apos;t remind you. You can allow them later in Settings.</value></data>
+  <data name="Scan_Section" xml:space="preserve"><value>Use the camera: photo of the barcode, then of the date</value></data>
+  <data name="Scan_Barcode" xml:space="preserve"><value>📷  Barcode</value></data>
+  <data name="Scan_Date" xml:space="preserve"><value>📷  Date</value></data>
+  <data name="Scan_BarcodeTitle" xml:space="preserve"><value>Photo of the barcode</value></data>
+  <data name="Scan_DateTitle" xml:space="preserve"><value>Photo of the date on the pack</value></data>
+  <data name="Scan_TakePhoto" xml:space="preserve"><value>Take a photo</value></data>
+  <data name="Scan_ChoosePhoto" xml:space="preserve"><value>Choose a photo</value></data>
+  <data name="Scan_Reading" xml:space="preserve"><value>Reading the photo…</value></data>
+  <data name="Scan_NoBarcode" xml:space="preserve"><value>No barcode found. Try again with the barcode filling most of the photo.</value></data>
+  <data name="Scan_ProductNotFound" xml:space="preserve"><value>Product not in the free product list. Type its name – it will be remembered next time you scan it.</value></data>
+  <data name="Scan_Offline" xml:space="preserve"><value>Could not look up the product (no internet). Type its name – it will be remembered next time.</value></data>
+  <data name="Scan_FromOpenFoodFacts" xml:space="preserve"><value>Product details from Open Food Facts</value></data>
+  <data name="Scan_Remembered" xml:space="preserve"><value>Remembered from an earlier scan</value></data>
+  <data name="Scan_DateConfirm" xml:space="preserve"><value>The pack says the last day is {0}. Is that right?</value></data>
+  <data name="Scan_Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Scan_No" xml:space="preserve"><value>No, I&apos;ll set it</value></data>
+  <data name="Scan_NoDate" xml:space="preserve"><value>Couldn&apos;t read a date. Try again with the date filling the photo in good light, or set it below.</value></data>
+  <data name="Scan_CameraUnavailable" xml:space="preserve"><value>The camera can&apos;t be opened. Choose a photo instead.</value></data>
 </root>

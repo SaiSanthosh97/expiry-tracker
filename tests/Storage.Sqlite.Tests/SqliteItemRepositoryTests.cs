@@ -36,6 +36,7 @@ public sealed class SqliteItemRepositoryTests : IAsyncLifetime
         {
             CategoryId = "eye-ear-drops",
             Quantity = 3,
+            Barcode = "8901719110016",
             PrintedExpiry = new DateOnly(2028, 1, 31),
             ManufactureDate = new DateOnly(2026, 1, 1),
             BestBeforeFromManufacture = ShelfLifeDuration.Months(24),
@@ -73,6 +74,37 @@ public sealed class SqliteItemRepositoryTests : IAsyncLifetime
         Assert.Null(await _repository.GetAsync(item.Id));
         Assert.Empty(await _repository.GetAllAsync(includeClosed: true));
         Assert.Single(await _repository.GetEverythingAsync());
+    }
+
+    [Fact]
+    public async Task Database_from_version_0_1_without_barcode_column_still_opens()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"hometracker-old-{Guid.NewGuid():N}.db3");
+        try
+        {
+            using (var old = new SQLite.SQLiteConnection(path))
+            {
+                // Schema as created by 0.1.0 (no Barcode column).
+                old.Execute("CREATE TABLE Items (Id varchar PRIMARY KEY NOT NULL, Name varchar, CategoryId varchar, Quantity integer, AddedDate integer, " +
+                    "PrintedExpiry integer, ManufactureDate integer, BestBeforeAmount integer, BestBeforeUnit integer, ShelfLifeAmount integer, ShelfLifeUnit integer, " +
+                    "OpenedDate integer, AfterOpeningAmount integer, AfterOpeningUnit integer, ReminderLeadDays integer, SnoozedUntil integer, ClosedDate integer, " +
+                    "ClosedReason integer, PhotoPath varchar, UpdatedAtMs integer, IsDeleted integer)");
+                old.Execute("INSERT INTO Items (Id, Name, CategoryId, Quantity, AddedDate, UpdatedAtMs, IsDeleted) VALUES ('old', 'Old milk', 'milk', 1, 739000, 0, 0)");
+            }
+
+            await using var repository = new SqliteItemRepository(path);
+            var item = await repository.GetAsync("old");
+
+            Assert.Equal("Old milk", item?.Name);
+            Assert.Null(item?.Barcode);
+            await repository.SaveAsync(item! with { Barcode = "8901719110016" });
+            Assert.Equal("8901719110016", (await repository.GetAsync("old"))?.Barcode);
+        }
+        finally
+        {
+            SQLite.SQLiteAsyncConnection.ResetPool();
+            File.Delete(path);
+        }
     }
 
     [Fact]

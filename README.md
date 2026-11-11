@@ -21,6 +21,9 @@ Product requirements: [`# Medicine Tracking & Adherence Platform.md`](%23%20Medi
 | [`Storage.Sqlite`](src/Components/Storage.Sqlite) | Stores items in a local SQLite database |
 | [`Core.AppUpdater`](src/Components/Core.AppUpdater) | Checks a GitHub repository's latest release for a newer installer |
 | [`Device.Reminders`](src/Components/Device.Reminders) | Android daily reminder: schedule, grouped notification with action buttons, restore after restart, battery-saver checks |
+| [`Core.LabelCapture`](src/Components/Core.LabelCapture) | Reads a pack photo: product barcode (with check-digit validation) and printed dates, through `IBarcodeReader` / `ITextReader` |
+| [`Core.ProductCatalog`](src/Components/Core.ProductCatalog) | Product lookup by barcode from several sources in order (e.g. household history, then Open Food Facts) |
+| [`Device.Vision`](src/Components/Device.Vision) | Android implementations of `IBarcodeReader` and `ITextReader` using Google ML Kit, on the phone |
 
 Each component is a library with no dependency on the app, so it can be referenced by other .NET projects. `Core.*` and `Storage.*` are plain .NET; `Device.*` contain platform code.
 

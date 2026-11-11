@@ -2,9 +2,13 @@
 using ExpiryTracker.App.Services;
 using ExpiryTracker.App.ViewModels;
 using ExpiryTracker.App.Views;
+using HomeTracker.Core.DateExtraction;
 using HomeTracker.Core.Items;
+using HomeTracker.Core.LabelCapture;
+using HomeTracker.Core.ProductCatalog;
 using HomeTracker.Core.ShelfLife;
 using HomeTracker.Device.Reminders;
+using HomeTracker.Device.Vision;
 using HomeTracker.Storage.Sqlite;
 using Microsoft.Extensions.Logging;
 
@@ -34,6 +38,19 @@ public static class MauiProgram
 		services.AddSingleton(_ => new ShelfLifeCatalog());
 		services.AddSingleton<ItemEvaluator>();
 		services.AddSingleton(_ => new HttpClient { Timeout = TimeSpan.FromSeconds(20) });
+		services.AddSingleton(_ => new LabelDateExtractor());
+		services.AddSingleton<IBarcodeReader, MlKitBarcodeReader>();
+		services.AddSingleton<ITextReader, MlKitTextReader>();
+		services.AddSingleton<LabelReader>();
+		services.AddSingleton<HouseholdProductProvider>();
+		services.AddSingleton(sp => new OpenFoodFactsProvider(
+			sp.GetRequiredService<HttpClient>(), "HomeTracker", AppInfo.Current.VersionString, UpdateService.RepositoryUrl.ToString()));
+		// Household history first (instant, offline), then Open Food Facts.
+		services.AddSingleton(sp => new ProductLookup(
+		[
+			sp.GetRequiredService<HouseholdProductProvider>(),
+			sp.GetRequiredService<OpenFoodFactsProvider>(),
+		]));
 
 		// App services
 		services.AddSingleton<AppSettings>();
@@ -43,6 +60,7 @@ public static class MauiProgram
 		services.AddSingleton<ReminderHealth>();
 		services.AddSingleton<UpdateService>();
 		services.AddSingleton<UndoService>();
+		services.AddSingleton<ScanService>();
 		services.AddSingleton<Dialogs>();
 
 		// Screens

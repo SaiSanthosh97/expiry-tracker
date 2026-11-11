@@ -157,6 +157,7 @@ public class ItemExportTests
             Name = "Eye drops",
             CategoryId = "eye-ear-drops",
             Quantity = 2,
+            Barcode = "8901719110016",
             AddedDate = new DateOnly(2026, 11, 1),
             PrintedExpiry = new DateOnly(2028, 1, 31),
             ManufactureDate = new DateOnly(2026, 1, 1),
