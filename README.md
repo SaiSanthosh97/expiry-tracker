@@ -17,8 +17,14 @@ Product requirements: [`# Medicine Tracking & Adherence Platform.md`](%23%20Medi
 | [`Core.DateExtraction`](src/Components/Core.DateExtraction) | Reads expiry, manufacture and "best before N months" from label text (OCR output) |
 | [`Core.ShelfLife`](src/Components/Core.ShelfLife) | Shelf-life durations, category presets (sweets, milk, eye drops…), reminder lead time |
 | [`Core.ExpiryEngine`](src/Components/Core.ExpiryEngine) | Works out the effective expiry and status (fresh / use soon / expired) |
+| [`Core.Items`](src/Components/Core.Items) | Tracked items, actions (opened, used up, thrown, undo, snooze), home-screen and reminder lists, export/import file format |
+| [`Storage.Sqlite`](src/Components/Storage.Sqlite) | Stores items in a local SQLite database |
+| [`Core.AppUpdater`](src/Components/Core.AppUpdater) | Checks a GitHub repository's latest release for a newer installer |
+| [`Device.Reminders`](src/Components/Device.Reminders) | Android daily reminder: schedule, grouped notification with action buttons, restore after restart, battery-saver checks |
 
-Each component is a plain .NET library with no dependency on the app, so it can be referenced by any .NET project.
+Each component is a library with no dependency on the app, so it can be referenced by other .NET projects. `Core.*` and `Storage.*` are plain .NET; `Device.*` contain platform code.
+
+The app itself is in [`src/Apps/ExpiryTracker.App`](src/Apps/ExpiryTracker.App).
 
 ## Build and test
 
@@ -29,7 +35,14 @@ dotnet build HomeTracker.slnx
 dotnet test HomeTracker.slnx
 ```
 
-The Android app additionally needs the MAUI Android workload (`dotnet workload install maui-android`) and a JDK 17.
+The Android app additionally needs the MAUI Android workload (`dotnet workload install maui-android`), a JDK 17 and the Android SDK:
+
+```sh
+dotnet publish src/Apps/ExpiryTracker.App -f net10.0-android -c Release -p:AndroidPackageFormats=apk \
+  -p:AndroidSdkDirectory=<android-sdk> -p:JavaSdkDirectory=<jdk>
+```
+
+The APK is written to `src/Apps/ExpiryTracker.App/bin/Release/net10.0-android/publish/`.
 
 ## Contributing rules
 

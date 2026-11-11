@@ -26,28 +26,40 @@
 		<ApplicationId>io.github.saisanthosh97.hometracker</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<!-- ApplicationDisplayVersion must match the GitHub release tag (v0.1.0) for update checks.
+		     ApplicationVersion must go up by one with every release. -->
+		<ApplicationDisplayVersion>0.1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
+		<!-- Phones are ARM64 (all target Samsung models); Debug keeps the defaults.
+		     -p:EmulatorBuild=true builds the Release app for the x86-64 emulator to test it on this PC. -->
+		<RuntimeIdentifiers Condition="'$(Configuration)' == 'Release' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">android-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifiers Condition="'$(EmulatorBuild)' == 'true' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">android-x64</RuntimeIdentifiers>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#00696B" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#00696B" BaseSize="128,128" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
-		
+
+		<!-- UI text. Translations go in AppResources.<language>.resx (e.g. AppResources.hi.resx). -->
+		<EmbeddedResource Update="Resources\Strings\AppResources.resx"
+		                  StronglyTypedLanguage="CSharp"
+		                  StronglyTypedClassName="AppResources"
+		                  StronglyTypedNamespace="ExpiryTracker.App.Resources.Strings"
+		                  StronglyTypedFileName="$(IntermediateOutputPath)AppResources.Designer.cs" />
+
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
 
@@ -56,8 +68,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Components\Core.ShelfLife\Core.ShelfLife.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.ExpiryEngine\Core.ExpiryEngine.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.DateExtraction\Core.DateExtraction.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.Items\Core.Items.csproj" />
+	  <ProjectReference Include="..\..\Components\Storage.Sqlite\Storage.Sqlite.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.AppUpdater\Core.AppUpdater.csproj" />
+	  <ProjectReference Include="..\..\Components\Device.Reminders\Device.Reminders.csproj" />
 	</ItemGroup>
 
 </Project>

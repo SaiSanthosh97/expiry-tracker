@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace HomeTracker.Core.ShelfLife;
 
 public enum ShelfLifeUnit
@@ -14,6 +16,7 @@ public enum ShelfLifeUnit
 /// </summary>
 public readonly record struct ShelfLifeDuration
 {
+    [JsonConstructor]
     public ShelfLifeDuration(int amount, ShelfLifeUnit unit)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(amount, 1);

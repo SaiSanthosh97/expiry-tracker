@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AppName" xml:space="preserve"><value>Home Tracker</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common_OK" xml:space="preserve"><value>OK</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Home_AddItem" xml:space="preserve"><value>+  Add item</value></data>
+  <data name="Home_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Home_Empty" xml:space="preserve"><value>Nothing here yet.</value></data>
+  <data name="Home_EmptyHint" xml:space="preserve"><value>Tap “+ Add item” to add sweets, medicines or anything with an expiry date.</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>All</value></data>
+  <data name="Filter_Food" xml:space="preserve"><value>Food</value></data>
+  <data name="Filter_Medicines" xml:space="preserve"><value>Medicines</value></data>
+  <data name="Filter_Other" xml:space="preserve"><value>Other</value></data>
+  <data name="Section_Expired" xml:space="preserve"><value>Expired – throw away</value></data>
+  <data name="Section_UseSoon" xml:space="preserve"><value>Use soon</value></data>
+  <data name="Section_Fresh" xml:space="preserve"><value>Fine</value></data>
+  <data name="Section_NoDate" xml:space="preserve"><value>No date</value></data>
+  <data name="Undo_UsedUp" xml:space="preserve"><value>{0} marked as used up</value></data>
+  <data name="Undo_Thrown" xml:space="preserve"><value>{0} marked as thrown away</value></data>
+  <data name="Undo_Button" xml:space="preserve"><value>UNDO</value></data>
+  <data name="Status_ExpiredYesterday" xml:space="preserve"><value>Expired yesterday</value></data>
+  <data name="Status_ExpiredDaysAgo" xml:space="preserve"><value>Expired {0} days ago</value></data>
+  <data name="Status_LastDayToday" xml:space="preserve"><value>Last day today</value></data>
+  <data name="Status_UseByTomorrow" xml:space="preserve"><value>Use by tomorrow</value></data>
+  <data name="Status_UseWithinDays" xml:space="preserve"><value>Use within {0} days</value></data>
+  <data name="Status_DaysLeft" xml:space="preserve"><value>{0} days left</value></data>
+  <data name="Status_GoodTill" xml:space="preserve"><value>Good till {0}</value></data>
+  <data name="Status_NoDate" xml:space="preserve"><value>No date</value></data>
+  <data name="Status_Opened" xml:space="preserve"><value>Opened</value></data>
+  <data name="Category_sweets" xml:space="preserve"><value>Sweets</value></data>
+  <data name="Category_milk_sweets" xml:space="preserve"><value>Milk sweets</value></data>
+  <data name="Category_leftovers" xml:space="preserve"><value>Leftovers</value></data>
+  <data name="Category_bakery" xml:space="preserve"><value>Bakery</value></data>
+  <data name="Category_cut_fruit" xml:space="preserve"><value>Cut fruit</value></data>
+  <data name="Category_milk" xml:space="preserve"><value>Milk</value></data>
+  <data name="Category_sauces" xml:space="preserve"><value>Sauces &amp; ketchup</value></data>
+  <data name="Category_jam" xml:space="preserve"><value>Jam &amp; spreads</value></data>
+  <data name="Category_packaged_food" xml:space="preserve"><value>Packaged food</value></data>
+  <data name="Category_chocolates" xml:space="preserve"><value>Chocolates</value></data>
+  <data name="Category_tablets" xml:space="preserve"><value>Tablets &amp; capsules</value></data>
+  <data name="Category_syrups" xml:space="preserve"><value>Syrups</value></data>
+  <data name="Category_eye_ear_drops" xml:space="preserve"><value>Eye &amp; ear drops</value></data>
+  <data name="Category_ointments" xml:space="preserve"><value>Ointments &amp; creams</value></data>
+  <data name="Category_cosmetics" xml:space="preserve"><value>Cosmetics</value></data>
+  <data name="Category_other" xml:space="preserve"><value>Other</value></data>
+  <data name="Duration_OneDay" xml:space="preserve"><value>1 day</value></data>
+  <data name="Duration_Days" xml:space="preserve"><value>{0} days</value></data>
+  <data name="Duration_OneWeek" xml:space="preserve"><value>1 week</value></data>
+  <data name="Duration_Weeks" xml:space="preserve"><value>{0} weeks</value></data>
+  <data name="Duration_OneMonth" xml:space="preserve"><value>1 month</value></data>
+  <data name="Duration_Months" xml:space="preserve"><value>{0} months</value></data>
+  <data name="Add_Title" xml:space="preserve"><value>Add item</value></data>
+  <data name="Edit_Title" xml:space="preserve"><value>Edit item</value></data>
+  <data name="Add_NameLabel" xml:space="preserve"><value>What is it?</value></data>
+  <data name="Add_NamePlaceholder" xml:space="preserve"><value>e.g. Kaju katli, Paracetamol</value></data>
+  <data name="Add_TypeLabel" xml:space="preserve"><value>Type</value></data>
+  <data name="Add_DateLabel" xml:space="preserve"><value>Date</value></data>
+  <data name="Add_ModePack" xml:space="preserve"><value>Expiry date on the pack</value></data>
+  <data name="Add_ModeNoDate" xml:space="preserve"><value>No date on it</value></data>
+  <data name="Add_ModeMade" xml:space="preserve"><value>Made on + good for some months</value></data>
+  <data name="Add_DayPrinted" xml:space="preserve"><value>Day is printed too</value></data>
+  <data name="Add_Day" xml:space="preserve"><value>Day</value></data>
+  <data name="Add_Month" xml:space="preserve"><value>Month</value></data>
+  <data name="Add_Year" xml:space="preserve"><value>Year</value></data>
+  <data name="Add_GoodFor" xml:space="preserve"><value>Good for</value></data>
+  <data name="Add_DaysUnit" xml:space="preserve"><value>days</value></data>
+  <data name="Add_MonthsUnit" xml:space="preserve"><value>months</value></data>
+  <data name="Add_MadeOn" xml:space="preserve"><value>Made / packed on</value></data>
+  <data name="Add_Quantity" xml:space="preserve"><value>How many?</value></data>
+  <data name="Add_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Add_InvalidNumber" xml:space="preserve"><value>Please enter a number of {0}.</value></data>
+  <data name="Add_LastDayPreview" xml:space="preserve"><value>Last day: {0}</value></data>
+  <data name="Add_PickDate" xml:space="preserve"><value>Please choose the month and year printed on the pack.</value></data>
+  <data name="Item_LastDay" xml:space="preserve"><value>Last day: {0}</value></data>
+  <data name="Item_Added" xml:space="preserve"><value>Added</value></data>
+  <data name="Item_PackExpiry" xml:space="preserve"><value>Pack expiry</value></data>
+  <data name="Item_MadeOn" xml:space="preserve"><value>Made on</value></data>
+  <data name="Item_Opened" xml:space="preserve"><value>Opened</value></data>
+  <data name="Item_Quantity" xml:space="preserve"><value>How many</value></data>
+  <data name="Item_OpenedToday" xml:space="preserve"><value>Opened today</value></data>
+  <data name="Item_UsedUp" xml:space="preserve"><value>Used up</value></data>
+  <data name="Item_Thrown" xml:space="preserve"><value>Thrown away</value></data>
+  <data name="Item_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Item_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Item_DeleteTitle" xml:space="preserve"><value>Delete {0}?</value></data>
+  <data name="Item_DeleteText" xml:space="preserve"><value>This removes it from the list. If you finished it, use “Used up” or “Thrown away” instead.</value></data>
+  <data name="Opened_AskTitle" xml:space="preserve"><value>Good for how long after opening?</value></data>
+  <data name="Opened_KeepPackDate" xml:space="preserve"><value>Not sure – keep the pack date</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings_Reminders" xml:space="preserve"><value>Reminders</value></data>
+  <data name="Settings_ReminderTime" xml:space="preserve"><value>Remind me at</value></data>
+  <data name="Settings_Notifications" xml:space="preserve"><value>Notifications allowed</value></data>
+  <data name="Settings_Battery" xml:space="preserve"><value>Battery saving turned off for this app</value></data>
+  <data name="Settings_Fix" xml:space="preserve"><value>Fix</value></data>
+  <data name="Settings_Done" xml:space="preserve"><value>✓ Done</value></data>
+  <data name="Settings_SamsungTip" xml:space="preserve"><value>Samsung phones: also open Settings → Battery → Background usage limits → Never sleeping apps, and add Home Tracker.</value></data>
+  <data name="Settings_OpenAppSettings" xml:space="preserve"><value>Open app settings</value></data>
+  <data name="Settings_TestReminder" xml:space="preserve"><value>Send a test reminder</value></data>
+  <data name="Test_Title" xml:space="preserve"><value>Test reminder</value></data>
+  <data name="Test_Text" xml:space="preserve"><value>Reminders are working on this phone.</value></data>
+  <data name="Settings_Backup" xml:space="preserve"><value>Backup and sharing</value></data>
+  <data name="Settings_Export" xml:space="preserve"><value>Share my list as a file</value></data>
+  <data name="Settings_Import" xml:space="preserve"><value>Import a list file</value></data>
+  <data name="Import_Done" xml:space="preserve"><value>Added or updated {0} items.</value></data>
+  <data name="Import_Failed" xml:space="preserve"><value>Could not import</value></data>
+  <data name="Settings_Updates" xml:space="preserve"><value>Updates</value></data>
+  <data name="Settings_Version" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="Settings_CheckUpdates" xml:space="preserve"><value>Check for updates</value></data>
+  <data name="Update_AvailableTitle" xml:space="preserve"><value>Update available</value></data>
+  <data name="Update_AvailableText" xml:space="preserve"><value>Version {0} is ready. Download it now?</value></data>
+  <data name="Update_InstallHint" xml:space="preserve"><value>When the download finishes, tap it to install. On Samsung, turn off Auto Blocker first (Settings → Security and privacy) and turn it back on afterwards.</value></data>
+  <data name="Update_Download" xml:space="preserve"><value>Download</value></data>
+  <data name="Update_Later" xml:space="preserve"><value>Later</value></data>
+  <data name="Update_None" xml:space="preserve"><value>You have the latest version.</value></data>
+  <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates. Check your internet connection.</value></data>
+  <data name="Settings_About" xml:space="preserve"><value>About</value></data>
+  <data name="About_Disclaimer" xml:space="preserve"><value>Home Tracker only reminds you about dates that you or the pack provide. It does not give medical or food-safety advice. Always follow the label and your doctor or pharmacist.</value></data>
+  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Nothing is uploaded. The app only contacts GitHub on Wi-Fi to check for updates.</value></data>
+  <data name="About_License" xml:space="preserve"><value>Free and open source (MIT License).</value></data>
+  <data name="About_SourceCode" xml:space="preserve"><value>Source code on GitHub</value></data>
+  <data name="Reminder_Channel" xml:space="preserve"><value>Expiry reminders</value></data>
+  <data name="Reminder_ChannelDescription" xml:space="preserve"><value>Tells you before things expire</value></data>
+  <data name="Reminder_SingleTitle" xml:space="preserve"><value>{0} – {1}</value></data>
+  <data name="Reminder_ManyTitle" xml:space="preserve"><value>{0} items need attention</value></data>
+  <data name="Reminder_TapToOpen" xml:space="preserve"><value>Tap to open Home Tracker</value></data>
+  <data name="Reminder_UsedUp" xml:space="preserve"><value>Used up</value></data>
+  <data name="Reminder_Thrown" xml:space="preserve"><value>Thrown</value></data>
+  <data name="Reminder_Tomorrow" xml:space="preserve"><value>Remind tomorrow</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>Welcome to Home Tracker</value></data>
+  <data name="Welcome_Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="Notifications_Denied" xml:space="preserve"><value>Without notifications the app can&apos;t remind you. You can allow them later in Settings.</value></data>
+</root>

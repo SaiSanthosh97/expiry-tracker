@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.HomePage"
+             x:DataType="vm:HomeViewModel"
+             Title="{x:Static s:AppResources.AppName}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{x:Static s:AppResources.Home_Settings}" Command="{Binding SettingsCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+
+        <!-- Filter chips: All / Food / Medicines / Other -->
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding Filters}"
+                        ItemsLayout="HorizontalList"
+                        Margin="16,12,16,4"
+                        HeightRequest="64">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:FilterChip">
+                    <Border Style="{StaticResource Chip}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=SelectFilterCommand, x:DataType=vm:HomeViewModel}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Label Text="{Binding Label}" FontSize="18" VerticalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="TextColor" Value="{StaticResource OnPrimary}" />
+                                    <Setter Property="FontFamily" Value="OpenSansSemibold" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Items, grouped: Expired, Use soon, Fine, No date -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Groups}"
+                        IsGrouped="True"
+                        Margin="16,0">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="24,48" Spacing="12" HorizontalOptions="Center">
+                    <Label Text="{x:Static s:AppResources.Home_Empty}" Style="{StaticResource Heading}" HorizontalTextAlignment="Center" />
+                    <Label Text="{x:Static s:AppResources.Home_EmptyHint}" Style="{StaticResource Subtle}" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate x:DataType="vm:ItemGroup">
+                    <Label Text="{Binding Title}" TextColor="{Binding Color}" Style="{StaticResource SectionLabel}" FontSize="20" />
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ItemCard">
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=OpenCommand, x:DataType=vm:HomeViewModel}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="10,*" >
+                            <BoxView Grid.Column="0" Color="{Binding StatusColor}" />
+                            <VerticalStackLayout Grid.Column="1" Padding="14,12" Spacing="2">
+                                <Label Text="{Binding Name}" FontFamily="OpenSansSemibold" FontSize="21" LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontFamily="OpenSansSemibold" FontSize="18" />
+                                <Label Text="{Binding Details}" Style="{StaticResource Subtle}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Undo bar after Used up / Thrown away -->
+        <Border Grid.Row="2"
+                IsVisible="{Binding HasUndo}"
+                BackgroundColor="#323232"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 10"
+                Margin="16,4"
+                Padding="16,4">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="{Binding UndoMessage}" TextColor="White" VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        Text="{x:Static s:AppResources.Undo_Button}"
+                        Command="{Binding UndoCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#80E5E6" />
+            </Grid>
+        </Border>
+
+        <Button Grid.Row="3"
+                Text="{x:Static s:AppResources.Home_AddItem}"
+                Command="{Binding AddCommand}"
+                FontSize="24"
+                HeightRequest="68"
+                Margin="16,8,16,16" />
+    </Grid>
+</ContentPage>

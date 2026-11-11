@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#512BD4</color>
-    <color name="colorPrimaryDark">#2B0B98</color>
-    <color name="colorAccent">#2B0B98</color>
+    <!-- Same teal as Resources/Styles/Colors.xaml; used by Android for the status bar and radio buttons/checkboxes. -->
+    <color name="colorPrimary">#00696B</color>
+    <color name="colorPrimaryDark">#004F51</color>
+    <color name="colorAccent">#00696B</color>
 </resources>

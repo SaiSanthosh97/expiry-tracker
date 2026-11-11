@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.ItemPage"
+             x:DataType="vm:ItemViewModel"
+             Title="{Binding Name}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <!-- Big status banner -->
+            <Border BackgroundColor="{Binding StatusColor}" StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="18,16">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{Binding StatusText}" TextColor="White" FontFamily="OpenSansSemibold" FontSize="26" />
+                    <Label Text="{Binding LastDayText}" TextColor="White" FontSize="18" />
+                </VerticalStackLayout>
+            </Border>
+
+            <VerticalStackLayout Spacing="2">
+                <Label Text="{Binding Name}" Style="{StaticResource Heading}" FontSize="26" />
+                <Label Text="{Binding Category}" Style="{StaticResource Subtle}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Details}" Spacing="6">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DetailRow">
+                        <Grid ColumnDefinitions="140,*">
+                            <Label Text="{Binding Label}" Style="{StaticResource Subtle}" />
+                            <Label Grid.Column="1" Text="{Binding Value}" />
+                        </Grid>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <Button Text="{x:Static s:AppResources.Item_OpenedToday}" Command="{Binding MarkOpenedCommand}"
+                    IsVisible="{Binding CanMarkOpened}" Style="{StaticResource OutlineButton}" Margin="0,8,0,0" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Text="{x:Static s:AppResources.Item_UsedUp}" Command="{Binding UsedUpCommand}"
+                        BackgroundColor="{StaticResource Fresh}" TextColor="White" HeightRequest="68" />
+                <Button Grid.Column="1" Text="{x:Static s:AppResources.Item_Thrown}" Command="{Binding ThrownCommand}"
+                        BackgroundColor="{StaticResource Expired}" TextColor="White" HeightRequest="68" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,8,0,0">
+                <Button Text="{x:Static s:AppResources.Item_Edit}" Command="{Binding EditCommand}" Style="{StaticResource OutlineButton}" />
+                <Button Grid.Column="1" Text="{x:Static s:AppResources.Item_Delete}" Command="{Binding DeleteCommand}" Style="{StaticResource OutlineButton}"
+                        TextColor="{StaticResource Expired}" BorderColor="{StaticResource Expired}" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

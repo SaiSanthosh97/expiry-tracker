@@ -3,12 +3,13 @@
     x:Class="ExpiryTracker.App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:ExpiryTracker.App"
-    Title="ExpiryTracker.App">
+    xmlns:views="clr-namespace:ExpiryTracker.App.Views"
+    xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+    Title="{x:Static s:AppResources.AppName}"
+    FlyoutBehavior="Disabled">
 
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        ContentTemplate="{DataTemplate views:HomePage}"
+        Route="home" />
 
 </Shell>

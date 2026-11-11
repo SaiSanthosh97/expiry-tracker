@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.AddItemPage"
+             x:DataType="vm:AddItemViewModel"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="CategoryChipTemplate" x:DataType="vm:CategoryChip">
+            <Border Style="{StaticResource Chip}" Margin="0,0,0,8">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddItemViewModel}}, Path=SelectCategoryCommand, x:DataType=vm:AddItemViewModel}"
+                                          CommandParameter="{Binding .}" />
+                </Border.GestureRecognizers>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                        <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                    </DataTrigger>
+                </Border.Triggers>
+                <Label Text="{Binding Label}" FontSize="17" LineBreakMode="WordWrap"
+                       HorizontalTextAlignment="Center" VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                            <Setter Property="TextColor" Value="{StaticResource OnPrimary}" />
+                            <Setter Property="FontFamily" Value="OpenSansSemibold" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,8,16,24">
+
+                <Label Text="{x:Static s:AppResources.Add_NameLabel}" Style="{StaticResource SectionLabel}" />
+                <Entry Text="{Binding Name}" Placeholder="{x:Static s:AppResources.Add_NamePlaceholder}" ReturnType="Done" />
+
+                <Label Text="{x:Static s:AppResources.Add_TypeLabel}" Style="{StaticResource SectionLabel}" />
+                <!-- Two equal columns: big, predictable targets; long names wrap instead of being cut. -->
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding CategoryRows}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CategoryRow">
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Grid Grid.Column="0" BindableLayout.ItemsSource="{Binding LeftCell}" BindableLayout.ItemTemplate="{StaticResource CategoryChipTemplate}" />
+                                <Grid Grid.Column="1" BindableLayout.ItemsSource="{Binding RightCell}" BindableLayout.ItemTemplate="{StaticResource CategoryChipTemplate}" />
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Label Text="{x:Static s:AppResources.Add_DateLabel}" Style="{StaticResource SectionLabel}" />
+                <VerticalStackLayout RadioButtonGroup.GroupName="dateMode">
+                    <RadioButton Content="{x:Static s:AppResources.Add_ModePack}" IsChecked="{Binding IsPackMode}" />
+                    <RadioButton Content="{x:Static s:AppResources.Add_ModeNoDate}" IsChecked="{Binding IsNoDateMode}" />
+                    <RadioButton Content="{x:Static s:AppResources.Add_ModeMade}" IsChecked="{Binding IsMadeMode}" />
+                </VerticalStackLayout>
+
+                <!-- Expiry date printed on the pack -->
+                <Border Style="{StaticResource Card}" Padding="14" Margin="0,8,0,0" IsVisible="{Binding IsPackMode}">
+                    <VerticalStackLayout Spacing="8">
+                        <HorizontalStackLayout>
+                            <CheckBox IsChecked="{Binding HasDay}" VerticalOptions="Center" />
+                            <Label Text="{x:Static s:AppResources.Add_DayPrinted}" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                            <Picker Grid.Column="0" Title="{x:Static s:AppResources.Add_Day}" IsVisible="{Binding HasDay}" WidthRequest="80"
+                                    ItemsSource="{Binding Days}" SelectedIndex="{Binding DayIndex}" />
+                            <Picker Grid.Column="1" Title="{x:Static s:AppResources.Add_Month}"
+                                    ItemsSource="{Binding Months}" SelectedIndex="{Binding MonthIndex}" />
+                            <Picker Grid.Column="2" Title="{x:Static s:AppResources.Add_Year}" WidthRequest="100"
+                                    ItemsSource="{Binding Years}" SelectedIndex="{Binding YearIndex}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- No date: good for N days from today -->
+                <Border Style="{StaticResource Card}" Padding="14" Margin="0,8,0,0" IsVisible="{Binding IsNoDateMode}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{x:Static s:AppResources.Add_GoodFor}" />
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Button Grid.Column="0" Text="−" Style="{StaticResource StepButton}" Command="{Binding ChangeShelfDaysCommand}" CommandParameter="-1" />
+                            <Label Grid.Column="1" Text="{Binding ShelfDaysText}" Style="{StaticResource Heading}" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                            <Button Grid.Column="2" Text="+" Style="{StaticResource StepButton}" Command="{Binding ChangeShelfDaysCommand}" CommandParameter="1" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Made on + best before N months -->
+                <Border Style="{StaticResource Card}" Padding="14" Margin="0,8,0,0" IsVisible="{Binding IsMadeMode}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{x:Static s:AppResources.Add_MadeOn}" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Picker Grid.Column="0" Title="{x:Static s:AppResources.Add_Month}"
+                                    ItemsSource="{Binding Months}" SelectedIndex="{Binding MadeMonthIndex}" />
+                            <Picker Grid.Column="1" Title="{x:Static s:AppResources.Add_Year}" WidthRequest="100"
+                                    ItemsSource="{Binding Years}" SelectedIndex="{Binding MadeYearIndex}" />
+                        </Grid>
+                        <Label Text="{x:Static s:AppResources.Add_GoodFor}" />
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Button Grid.Column="0" Text="−" Style="{StaticResource StepButton}" Command="{Binding ChangeGoodForMonthsCommand}" CommandParameter="-1" />
+                            <Label Grid.Column="1" Text="{Binding GoodForMonthsText}" Style="{StaticResource Heading}" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                            <Button Grid.Column="2" Text="+" Style="{StaticResource StepButton}" Command="{Binding ChangeGoodForMonthsCommand}" CommandParameter="1" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="{x:Static s:AppResources.Add_Quantity}" Style="{StaticResource SectionLabel}" />
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                    <Button Grid.Column="0" Text="−" Style="{StaticResource StepButton}" Command="{Binding ChangeQuantityCommand}" CommandParameter="-1" />
+                    <Label Grid.Column="1" Text="{Binding Quantity}" Style="{StaticResource Heading}" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                    <Button Grid.Column="2" Text="+" Style="{StaticResource StepButton}" Command="{Binding ChangeQuantityCommand}" CommandParameter="1" />
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Always visible: what the app will remember, and Save -->
+        <VerticalStackLayout Grid.Row="1" Padding="16,8,16,16" Spacing="8">
+            <Label Text="{Binding Preview}" Style="{StaticResource Heading}" FontSize="20" HorizontalTextAlignment="Center" />
+            <Button Text="{x:Static s:AppResources.Add_Save}" Command="{Binding SaveCommand}" FontSize="24" HeightRequest="68" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>
