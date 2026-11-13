@@ -175,6 +175,7 @@ public sealed partial class ItemViewModel(ItemService items, UndoService undo, D
         if (confirmed)
         {
             await items.DeleteAsync(_evaluation.Item.Id);
+            PhotoStore.Delete(_evaluation.Item.PhotoPath);
             await Shell.Current.GoToAsync("..");
         }
     }

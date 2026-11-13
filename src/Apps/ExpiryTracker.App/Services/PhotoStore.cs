@@ -50,8 +50,9 @@ public sealed class PhotoStore(IItemRepository repository)
     }
 
     /// <summary>
-    /// Deletes photos no item uses any more: items that were deleted, and photos taken on the Add screen
-    /// that was then left without saving. Recent files are kept in case that screen is still open.
+    /// Deletes photos no longer needed: of deleted items, of items marked used up or thrown away (once
+    /// Undo is no longer offered), and photos taken on the Add screen that was left without saving.
+    /// Recent files are kept in case that screen is still open.
     /// </summary>
     public async Task CleanUpAsync()
     {
@@ -60,8 +61,9 @@ public sealed class PhotoStore(IItemRepository repository)
             return;
         }
 
+        var undoEnded = DateTimeOffset.Now - UndoService.WidgetWindow;
         var used = (await repository.GetEverythingAsync())
-            .Where(i => !i.IsDeleted && i.PhotoPath is not null)
+            .Where(i => !i.IsDeleted && i.PhotoPath is not null && (!i.IsClosed || i.UpdatedAt > undoEnded))
             .Select(i => i.PhotoPath!)
             .ToHashSet(StringComparer.Ordinal);
 
