@@ -37,6 +37,43 @@ public static partial class DailyReminders
     /// <summary>Shows a notification immediately, regardless of what's due.</summary>
     public static void Show(ReminderContent content) => Post(AppContext, content);
 
+    /// <summary>
+    /// Shows a separate notification (e.g. "Appa's phone hasn't checked in") without replacing the daily reminder.
+    /// The same <paramref name="key"/> replaces its previous notification.
+    /// </summary>
+    public static void ShowMessage(string key, string title, string text)
+    {
+        var options = Options ?? throw new InvalidOperationException("DailyReminders.Initialize was not called.");
+        var context = AppContext;
+        var launch = context.PackageManager!.GetLaunchIntentForPackage(context.PackageName!)!;
+        launch.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTop);
+        var open = PendingIntent.GetActivity(context, 0, launch, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
+
+        var notification = new Notification.Builder(context, ChannelId)
+            .SetSmallIcon(options.SmallIconResourceId)
+            .SetContentTitle(title)
+            .SetContentText(text)
+            .SetStyle(new Notification.BigTextStyle().BigText(text))
+            .SetContentIntent(open)
+            .SetAutoCancel(true)
+            .Build();
+
+        var manager = (NotificationManager)context.GetSystemService(Context.NotificationService)!;
+        // Message notifications use ids from 2000 up, apart from the daily reminder's id.
+        manager.Notify(2000 + (int)((uint)StableHash(key) % 100000), notification);
+    }
+
+    private static int StableHash(string text)
+    {
+        var hash = 17;
+        foreach (var c in text)
+        {
+            hash = unchecked((hash * 31) + c);
+        }
+
+        return hash;
+    }
+
     public static bool AreNotificationsEnabled =>
         ((NotificationManager)AppContext.GetSystemService(Context.NotificationService)!).AreNotificationsEnabled();
 

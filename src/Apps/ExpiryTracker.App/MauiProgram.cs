@@ -1,4 +1,4 @@
-﻿using ExpiryTracker.App.Resources.Strings;
+using ExpiryTracker.App.Resources.Strings;
 using ExpiryTracker.App.Services;
 using ExpiryTracker.App.ViewModels;
 using ExpiryTracker.App.Views;
@@ -7,6 +7,8 @@ using HomeTracker.Core.Items;
 using HomeTracker.Core.LabelCapture;
 using HomeTracker.Core.ProductCatalog;
 using HomeTracker.Core.ShelfLife;
+using HomeTracker.Core.Households;
+using HomeTracker.Device.BackgroundWork;
 using HomeTracker.Device.HomeWidget;
 using HomeTracker.Device.Reminders;
 using HomeTracker.Device.Vision;
@@ -35,7 +37,9 @@ public static class MauiProgram
 		var services = builder.Services;
 
 		// Components
-		services.AddSingleton<IItemRepository>(_ => new SqliteItemRepository(Path.Combine(FileSystem.AppDataDirectory, "items.db3")));
+		var databasePath = Path.Combine(FileSystem.AppDataDirectory, "items.db3");
+		services.AddSingleton<IItemRepository>(_ => new SqliteItemRepository(databasePath));
+		services.AddSingleton<IHomeRepository>(_ => new SqliteHomeRepository(databasePath));
 		services.AddSingleton(_ => new ShelfLifeCatalog());
 		services.AddSingleton<ItemEvaluator>();
 		services.AddSingleton(_ => new HttpClient { Timeout = TimeSpan.FromSeconds(20) });
@@ -64,6 +68,8 @@ public static class MauiProgram
 		services.AddSingleton<ScanService>();
 		services.AddSingleton<Dialogs>();
 		services.AddSingleton<PhotoStore>();
+		services.AddSingleton<HomeService>();
+		services.AddSingleton<FamilySyncService>();
 		services.AddSingleton<WidgetSource>();
 
 		// Screens
@@ -76,6 +82,8 @@ public static class MauiProgram
 		services.AddTransient<SettingsViewModel>();
 		services.AddTransient<SettingsPage>();
 		services.AddTransient<UpdatePage>();
+		services.AddTransient<FamilyViewModel>();
+		services.AddTransient<FamilyPage>();
 
 		var app = builder.Build();
 
@@ -91,6 +99,9 @@ public static class MauiProgram
 				AppResources.Reminder_UsedUp,
 				AppResources.Reminder_Thrown,
 				AppResources.Reminder_Tomorrow));
+
+		// Family sync in the background (about every 15 minutes, only once a home is shared).
+		BackgroundWork.Initialize(token => app.Services.GetRequiredService<FamilySyncService>().SyncNowAsync(token));
 
 		// Home-screen widget: redrawn whenever the list changes.
 		HomeWidget.Initialize(

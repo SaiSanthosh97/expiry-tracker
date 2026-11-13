@@ -40,14 +40,16 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
     private readonly ItemService _items;
     private readonly Dialogs _dialogs;
     private readonly ScanService _scan;
+    private readonly HomeService _homes;
     private TrackedItem? _editing;
     private bool _loading;
     private string? _barcode;
     private ShelfLifeDuration? _afterOpeningFromLabel;
     private string? _originalPhoto;
 
-    public AddItemViewModel(ItemService items, ShelfLifeCatalog catalog, Dialogs dialogs, ScanService scan)
+    public AddItemViewModel(ItemService items, ShelfLifeCatalog catalog, Dialogs dialogs, ScanService scan, HomeService homes)
     {
+        _homes = homes;
         _items = items;
         _dialogs = dialogs;
         _scan = scan;
@@ -389,7 +391,8 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
             return;
         }
 
-        await _items.SaveAsync(BuildItem());
+        var item = BuildItem();
+        await _items.SaveAsync(item.HomeId is null ? item with { HomeId = (await _homes.GetCurrentAsync()).Id } : item);
         if (_originalPhoto != PhotoFile)
         {
             PhotoStore.Delete(_originalPhoto);

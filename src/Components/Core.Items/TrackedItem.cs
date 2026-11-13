@@ -13,6 +13,9 @@ public sealed record TrackedItem
 {
     public required string Id { get; init; }
 
+    /// <summary>The home (household) this item belongs to; see Core.Households. Null in lists from before homes existed.</summary>
+    public string? HomeId { get; init; }
+
     public required string Name { get; init; }
 
     /// <summary>A <see cref="ShelfLifeCategory.Id"/>.</summary>
@@ -50,6 +53,7 @@ public sealed record TrackedItem
 
     public ClosedReason? ClosedReason { get; init; }
 
+    /// <summary>File name of the item's photo on the phone that took it (photos are not synced).</summary>
     public string? PhotoPath { get; init; }
 
     /// <summary>Last change time; the newer copy wins when merging imports (and, later, sync).</summary>

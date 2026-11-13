@@ -120,7 +120,7 @@
   <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates. Check your internet connection.</value></data>
   <data name="Settings_About" xml:space="preserve"><value>About</value></data>
   <data name="About_Disclaimer" xml:space="preserve"><value>Home Tracker only reminds you about dates that you or the pack provide. It does not give medical or food-safety advice. Always follow the label and your doctor or pharmacist.</value></data>
-  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone. A small copy of each product photo is kept inside the app (not in your gallery) and deleted with the item. When a photo shows a barcode, only the barcode number is sent to Open Food Facts to find the product name. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
+  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone. A small copy of each product photo is kept inside the app (not in your gallery) and deleted with the item. When a photo shows a barcode, only the barcode number is sent to Open Food Facts to find the product name. If you share a home with family, its list (not photos) goes through the free ntfy.sh relay, encrypted so only your family&apos;s phones can read it. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
   <data name="About_License" xml:space="preserve"><value>Free and open source (MIT License).</value></data>
   <data name="About_SourceCode" xml:space="preserve"><value>Source code on GitHub</value></data>
   <data name="Reminder_Channel" xml:space="preserve"><value>Expiry reminders</value></data>
@@ -171,4 +171,60 @@
   <data name="Update_Ready" xml:space="preserve"><value>Downloaded. Tap “Install now”, then Update on Android&apos;s screen.</value></data>
   <data name="Update_Damaged" xml:space="preserve"><value>The download was damaged, so it was not installed. Please try again.</value></data>
   <data name="Update_DownloadFailed" xml:space="preserve"><value>The download stopped. Check your internet connection and try again.</value></data>
+  <data name="Home_Family" xml:space="preserve"><value>Family</value></data>
+  <data name="Home_DefaultName" xml:space="preserve"><value>My home</value></data>
+  <data name="Settings_Family" xml:space="preserve"><value>👪  Family: share this list</value></data>
+  <data name="Ago_JustNow" xml:space="preserve"><value>just now</value></data>
+  <data name="Ago_Minutes" xml:space="preserve"><value>{0} min ago</value></data>
+  <data name="Ago_OneHour" xml:space="preserve"><value>1 hour ago</value></data>
+  <data name="Ago_Hours" xml:space="preserve"><value>{0} hours ago</value></data>
+  <data name="Ago_OneDay" xml:space="preserve"><value>yesterday</value></data>
+  <data name="Ago_Days" xml:space="preserve"><value>{0} days ago</value></data>
+  <data name="Family_Title" xml:space="preserve"><value>Family</value></data>
+  <data name="Family_NotShared" xml:space="preserve"><value>Only on this phone</value></data>
+  <data name="Family_LastSync" xml:space="preserve"><value>Shared with family · updated {0}</value></data>
+  <data name="Family_NotSyncedYet" xml:space="preserve"><value>Shared with family · not updated yet</value></data>
+  <data name="Family_ThisPhone" xml:space="preserve"><value>This phone</value></data>
+  <data name="Family_LastSeen" xml:space="preserve"><value>Last heard from {0}</value></data>
+  <data name="Family_ShareIntro" xml:space="preserve"><value>Share this list with family phones. Everyone sees the same items, and changes reach each phone within about 15 minutes – also when you are away from home. Everything is encrypted on the phone before it is sent.</value></data>
+  <data name="Family_ShareButton" xml:space="preserve"><value>Share with family</value></data>
+  <data name="Family_SharedTitle" xml:space="preserve"><value>Ready to share</value></data>
+  <data name="Family_SharedText" xml:space="preserve"><value>Now invite family: let them scan the QR code with Home Tracker, or tap “Send invite” to send it on WhatsApp.</value></data>
+  <data name="Family_InviteHeading" xml:space="preserve"><value>Invite family</value></data>
+  <data name="Family_InviteHelp" xml:space="preserve"><value>On the other phone: Home Tracker → Family → Join a family home, then take a photo of this code. Or send the invite on WhatsApp and copy it there.</value></data>
+  <data name="Family_SendInvite" xml:space="preserve"><value>Send invite (WhatsApp…)</value></data>
+  <data name="Family_InviteMessage" xml:space="preserve"><value>Join our Home Tracker list “{0}”.
+Copy this whole message, then open Home Tracker → Family → Join a family home.
+
+{1}
+
+Only share this with family: anyone with it can see and change the list.</value></data>
+  <data name="Family_InviteWarning" xml:space="preserve"><value>Only share the invite with family: anyone who has it can see and change this list.</value></data>
+  <data name="Family_Phones" xml:space="preserve"><value>Phones in this home</value></data>
+  <data name="Family_SyncNow" xml:space="preserve"><value>Update now</value></data>
+  <data name="Family_RemindThisHome" xml:space="preserve"><value>Remind me about this home&apos;s items</value></data>
+  <data name="Family_JoinHeading" xml:space="preserve"><value>Join a family home</value></data>
+  <data name="Family_JoinHelp" xml:space="preserve"><value>Got an invite from family? Copy their WhatsApp message first, or have their QR code ready.</value></data>
+  <data name="Family_JoinTitle" xml:space="preserve"><value>Join a family home</value></data>
+  <data name="Family_JoinByQr" xml:space="preserve"><value>Photo of the QR code</value></data>
+  <data name="Family_JoinByPaste" xml:space="preserve"><value>Paste the invite</value></data>
+  <data name="Family_PasteHint" xml:space="preserve"><value>Paste the invite message here.</value></data>
+  <data name="Family_NoQr" xml:space="preserve"><value>No invite QR code found in the photo. Try again with the code filling most of the photo.</value></data>
+  <data name="Family_BadInvite" xml:space="preserve"><value>That is not a Home Tracker invite. Copy the whole message and try again.</value></data>
+  <data name="Family_JoinConfirm" xml:space="preserve"><value>Join “{0}”? Its list will appear on this phone and your changes will be shared with that family.</value></data>
+  <data name="Family_JoinButton" xml:space="preserve"><value>Join</value></data>
+  <data name="Family_JoinedTitle" xml:space="preserve"><value>Joined</value></data>
+  <data name="Family_JoinedText" xml:space="preserve"><value>You are now in “{0}”. The family&apos;s list arrives within about 15 minutes, once their phones are online.</value></data>
+  <data name="Family_SwitchHome" xml:space="preserve"><value>Switch home</value></data>
+  <data name="Family_Rename" xml:space="preserve"><value>Rename</value></data>
+  <data name="Family_HomeNameHint" xml:space="preserve"><value>Name of this home, e.g. Amma&apos;s house</value></data>
+  <data name="Family_PhoneName" xml:space="preserve"><value>This phone&apos;s name</value></data>
+  <data name="Family_PhoneNameHint" xml:space="preserve"><value>How family will see this phone, e.g. Appa&apos;s phone</value></data>
+  <data name="Family_Change" xml:space="preserve"><value>Change</value></data>
+  <data name="Family_LeaveTitle" xml:space="preserve"><value>Leave “{0}”?</value></data>
+  <data name="Family_LeaveText" xml:space="preserve"><value>This home and its list are removed from this phone. Other family phones keep the list.</value></data>
+  <data name="Family_LeaveButton" xml:space="preserve"><value>Leave this home</value></data>
+  <data name="Family_Privacy" xml:space="preserve"><value>Shared lists go through ntfy.sh, a free public relay, encrypted on this phone with a key only your family has. The relay cannot read them and keeps them for at most 12 hours. Photos are not shared.</value></data>
+  <data name="Family_SilentTitle" xml:space="preserve"><value>{0} hasn&apos;t checked in</value></data>
+  <data name="Family_SilentText" xml:space="preserve"><value>{0} has not been in touch for a day ({1}). Its reminders may be blocked by battery saving, or the phone may be off.</value></data>
 </root>

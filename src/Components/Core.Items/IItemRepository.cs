@@ -12,4 +12,7 @@ public interface IItemRepository
 
     /// <summary>Every row, including deleted ones (for export and merging).</summary>
     Task<IReadOnlyList<TrackedItem>> GetEverythingAsync();
+
+    /// <summary>Removes every item of a home from this phone (when the phone leaves that home).</summary>
+    Task PurgeHomeAsync(string homeId);
 }

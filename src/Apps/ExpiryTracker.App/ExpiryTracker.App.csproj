@@ -31,8 +31,8 @@
 		<!-- Versions -->
 		<!-- ApplicationDisplayVersion must match the GitHub release tag (v0.1.0) for update checks.
 		     ApplicationVersion must go up by one with every release. -->
-		<ApplicationDisplayVersion>0.3.1</ApplicationDisplayVersion>
-		<ApplicationVersion>4</ApplicationVersion>
+		<ApplicationDisplayVersion>0.4.0</ApplicationDisplayVersion>
+		<ApplicationVersion>5</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
@@ -68,6 +68,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="QRCoder" Version="1.6.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 	</ItemGroup>
@@ -84,6 +85,10 @@
 	  <ProjectReference Include="..\..\Components\Core.ProductCatalog\Core.ProductCatalog.csproj" />
 	  <ProjectReference Include="..\..\Components\Device.Vision\Device.Vision.csproj" />
 	  <ProjectReference Include="..\..\Components\Device.HomeWidget\Device.HomeWidget.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.Households\Core.Households.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.Sync\Core.Sync.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.Relay\Core.Relay.csproj" />
+	  <ProjectReference Include="..\..\Components\Device.BackgroundWork\Device.BackgroundWork.csproj" />
 	</ItemGroup>
 
 </Project>

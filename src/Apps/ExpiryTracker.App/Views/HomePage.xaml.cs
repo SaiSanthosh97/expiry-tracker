@@ -55,6 +55,7 @@ public partial class HomePage : ContentPage
 
         await _health.ScheduleAndCatchUpAsync();
         HomeTracker.Device.HomeWidget.HomeWidget.Refresh();
+        await IPlatformApplication.Current!.Services.GetRequiredService<FamilySyncService>().UpdateBackgroundAsync();
         UpdateService.DeleteDownloads();
         _ = _photos.CleanUpAsync();
         ScanService.ClearPickerCopies();

@@ -6,11 +6,12 @@ using HomeTracker.Device.HomeWidget;
 namespace ExpiryTracker.App.Services;
 
 /// <summary>Fills the home-screen widget: the items closest to their last day, each with a "Used" button.</summary>
-public sealed class WidgetSource(ItemService items, UndoService undo) : IHomeWidgetSource
+public sealed class WidgetSource(ItemService items, HomeService homes, UndoService undo) : IHomeWidgetSource
 {
     public async Task<HomeWidgetContent> BuildAsync(DateOnly today)
     {
-        var sections = ItemLists.ForHome(await items.GetOpenAsync(), null);
+        var home = await homes.GetCurrentAsync();
+        var sections = ItemLists.ForHome(await items.GetOpenAsync(home.Id), null);
         var attention = sections.Expired.Count + sections.UseSoon.Count;
 
         var rows = sections.Expired.Concat(sections.UseSoon).Concat(sections.Fresh)

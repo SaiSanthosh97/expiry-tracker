@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.FamilyPage"
+             x:DataType="vm:FamilyViewModel"
+             Title="{x:Static s:AppResources.Family_Title}">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16,8,16,32" Spacing="12">
+
+                <!-- Which home -->
+                <Border Style="{StaticResource Card}" Padding="16">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding HomeName}" Style="{StaticResource Heading}" FontSize="26" />
+                        <Label Text="{Binding StatusText}" Style="{StaticResource Subtle}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,6,0,0">
+                            <Button Text="{x:Static s:AppResources.Family_Rename}" Command="{Binding RenameCommand}" Style="{StaticResource OutlineButton}" />
+                            <Button Grid.Column="1" Text="{x:Static s:AppResources.Family_SwitchHome}" Command="{Binding SwitchHomeCommand}"
+                                    Style="{StaticResource OutlineButton}" IsVisible="{Binding HasManyHomes}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Not shared yet -->
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding IsNotShared}">
+                    <Label Text="{x:Static s:AppResources.Family_ShareIntro}" />
+                    <Button Text="{x:Static s:AppResources.Family_ShareButton}" Command="{Binding ShareCommand}" FontSize="20" HeightRequest="64" />
+                </VerticalStackLayout>
+
+                <!-- Shared: invite -->
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding IsShared}">
+                    <Label Text="{x:Static s:AppResources.Family_InviteHeading}" Style="{StaticResource SectionLabel}" FontSize="22" />
+                    <Label Text="{x:Static s:AppResources.Family_InviteHelp}" />
+                    <Border BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="12" HorizontalOptions="Center">
+                        <Image Source="{Binding InviteQr}" WidthRequest="240" HeightRequest="240" />
+                    </Border>
+                    <Button Text="{x:Static s:AppResources.Family_SendInvite}" Command="{Binding SendInviteCommand}" FontSize="20" HeightRequest="64" />
+                    <Label Text="{x:Static s:AppResources.Family_InviteWarning}" Style="{StaticResource Subtle}" />
+
+                    <Label Text="{x:Static s:AppResources.Family_Phones}" Style="{StaticResource SectionLabel}" FontSize="22" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Members}" Spacing="8">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:MemberRow">
+                                <Border Style="{StaticResource Card}" Padding="14,10">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding Name}" FontFamily="OpenSansSemibold" FontSize="19" />
+                                        <Label Text="{Binding Detail}" Style="{StaticResource Subtle}">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsSilent}" Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource Expired}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <Button Text="{x:Static s:AppResources.Family_SyncNow}" Command="{Binding SyncNowCommand}" Style="{StaticResource OutlineButton}" />
+
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                        <Label Text="{x:Static s:AppResources.Family_RemindThisHome}" VerticalOptions="Center" />
+                        <Switch Grid.Column="1" IsToggled="{Binding RemindThisHome}" OnColor="{StaticResource Primary}" />
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- Join another home -->
+                <Label Text="{x:Static s:AppResources.Family_JoinHeading}" Style="{StaticResource SectionLabel}" FontSize="22" />
+                <Label Text="{x:Static s:AppResources.Family_JoinHelp}" />
+                <Button Text="{x:Static s:AppResources.Family_JoinTitle}" Command="{Binding JoinCommand}" Style="{StaticResource OutlineButton}" />
+
+                <!-- This phone -->
+                <Label Text="{x:Static s:AppResources.Family_PhoneName}" Style="{StaticResource SectionLabel}" FontSize="22" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Label Text="{Binding DeviceName}" VerticalOptions="Center" FontSize="19" />
+                    <Button Grid.Column="1" Text="{x:Static s:AppResources.Family_Change}" Command="{Binding ChangeDeviceNameCommand}" Style="{StaticResource OutlineButton}" />
+                </Grid>
+
+                <Label Text="{x:Static s:AppResources.Family_Privacy}" Style="{StaticResource Subtle}" Margin="0,8,0,0" />
+
+                <Button Text="{x:Static s:AppResources.Family_LeaveButton}" Command="{Binding LeaveCommand}" IsVisible="{Binding IsShared}"
+                        Style="{StaticResource OutlineButton}" TextColor="{StaticResource Expired}" BorderColor="{StaticResource Expired}" Margin="0,12,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#66000000">
+            <ActivityIndicator IsRunning="{Binding IsBusy}" Color="White" HeightRequest="56" WidthRequest="56" VerticalOptions="Center" HorizontalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

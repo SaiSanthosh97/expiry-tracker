@@ -5,9 +5,10 @@
              xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
              x:Class="ExpiryTracker.App.Views.HomePage"
              x:DataType="vm:HomeViewModel"
-             Title="{x:Static s:AppResources.AppName}">
+             Title="{Binding Title}">
 
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{x:Static s:AppResources.Home_Family}" Command="{Binding FamilyCommand}" />
         <ToolbarItem Text="{x:Static s:AppResources.Home_Settings}" Command="{Binding SettingsCommand}" />
     </ContentPage.ToolbarItems>
 

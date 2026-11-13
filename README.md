@@ -24,6 +24,10 @@ Product requirements: [`# Medicine Tracking & Adherence Platform.md`](%23%20Medi
 | [`Core.LabelCapture`](src/Components/Core.LabelCapture) | Reads a pack photo: product barcode (with check-digit validation), a suggested product name (the largest text) and printed dates, through `IBarcodeReader` / `ITextReader` |
 | [`Core.ProductCatalog`](src/Components/Core.ProductCatalog) | Product lookup by barcode from several sources in order (e.g. household history, then Open Food Facts) |
 | [`Device.Vision`](src/Components/Device.Vision) | Android implementations of `IBarcodeReader` and `ITextReader` using Google ML Kit, on the phone; `PhotoShrinker` saves small, upright copies of photos |
+| [`Core.Households`](src/Components/Core.Households) | Homes shared between phones, invite codes (QR / text), family phones and "hasn't checked in" logic |
+| [`Core.Sync`](src/Components/Core.Sync) | End-to-end encryption (AES-256-GCM, `SealedBox`), compressed sync messages, splitting lists into relay-sized messages |
+| [`Core.Relay`](src/Components/Core.Relay) | Publish and fetch messages through an [ntfy](https://ntfy.sh) server (public or self-hosted) |
+| [`Device.BackgroundWork`](src/Components/Device.BackgroundWork) | Android periodic background work (JobScheduler, about every 15 minutes, survives restarts) |
 | [`Device.HomeWidget`](src/Components/Device.HomeWidget) | Android home-screen widget: a header, up to three rows with a coloured status and an action button, and an Add button |
 
 Each component is a library with no dependency on the app, so it can be referenced by other .NET projects. `Core.*` and `Storage.*` are plain .NET; `Device.*` contain platform code.

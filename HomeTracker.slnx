@@ -6,10 +6,14 @@
     <Project Path="src/Components/Core.AppUpdater/Core.AppUpdater.csproj" />
     <Project Path="src/Components/Core.DateExtraction/Core.DateExtraction.csproj" />
     <Project Path="src/Components/Core.ExpiryEngine/Core.ExpiryEngine.csproj" />
+    <Project Path="src/Components/Core.Households/Core.Households.csproj" />
     <Project Path="src/Components/Core.Items/Core.Items.csproj" />
     <Project Path="src/Components/Core.LabelCapture/Core.LabelCapture.csproj" />
     <Project Path="src/Components/Core.ProductCatalog/Core.ProductCatalog.csproj" />
+    <Project Path="src/Components/Core.Relay/Core.Relay.csproj" />
     <Project Path="src/Components/Core.ShelfLife/Core.ShelfLife.csproj" />
+    <Project Path="src/Components/Core.Sync/Core.Sync.csproj" />
+    <Project Path="src/Components/Device.BackgroundWork/Device.BackgroundWork.csproj" />
     <Project Path="src/Components/Device.HomeWidget/Device.HomeWidget.csproj" />
     <Project Path="src/Components/Device.Reminders/Device.Reminders.csproj" />
     <Project Path="src/Components/Device.Vision/Device.Vision.csproj" />
@@ -19,10 +23,13 @@
     <Project Path="tests/Core.AppUpdater.Tests/Core.AppUpdater.Tests.csproj" />
     <Project Path="tests/Core.DateExtraction.Tests/Core.DateExtraction.Tests.csproj" />
     <Project Path="tests/Core.ExpiryEngine.Tests/Core.ExpiryEngine.Tests.csproj" />
+    <Project Path="tests/Core.Households.Tests/Core.Households.Tests.csproj" />
     <Project Path="tests/Core.Items.Tests/Core.Items.Tests.csproj" />
     <Project Path="tests/Core.LabelCapture.Tests/Core.LabelCapture.Tests.csproj" />
     <Project Path="tests/Core.ProductCatalog.Tests/Core.ProductCatalog.Tests.csproj" />
+    <Project Path="tests/Core.Relay.Tests/Core.Relay.Tests.csproj" />
     <Project Path="tests/Core.ShelfLife.Tests/Core.ShelfLife.Tests.csproj" />
+    <Project Path="tests/Core.Sync.Tests/Core.Sync.Tests.csproj" />
     <Project Path="tests/Storage.Sqlite.Tests/Storage.Sqlite.Tests.csproj" />
   </Folder>
 </Solution>

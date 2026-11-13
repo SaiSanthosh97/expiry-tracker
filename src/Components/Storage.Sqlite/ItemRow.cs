@@ -11,6 +11,9 @@ internal sealed class ItemRow
     [PrimaryKey]
     public string Id { get; set; } = "";
 
+    [Indexed]
+    public string? HomeId { get; set; }
+
     public string Name { get; set; } = "";
 
     public string CategoryId { get; set; } = "";
@@ -59,6 +62,7 @@ internal sealed class ItemRow
     public static ItemRow From(TrackedItem item) => new()
     {
         Id = item.Id,
+        HomeId = item.HomeId,
         Name = item.Name,
         CategoryId = item.CategoryId,
         Quantity = item.Quantity,
@@ -85,6 +89,7 @@ internal sealed class ItemRow
     public TrackedItem ToItem() => new()
     {
         Id = Id,
+        HomeId = HomeId,
         Name = Name,
         CategoryId = CategoryId,
         Quantity = Quantity,

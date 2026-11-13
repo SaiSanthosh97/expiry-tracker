@@ -34,13 +34,15 @@ public sealed partial class FilterChip(string label, CategoryGroup? group) : Obs
 public sealed partial class HomeViewModel : ObservableObject
 {
     private readonly ItemService _items;
+    private readonly HomeService _homes;
     private readonly UndoService _undo;
     private CancellationTokenSource? _undoTimer;
     private string? _undoItemId;
 
-    public HomeViewModel(ItemService items, UndoService undo)
+    public HomeViewModel(ItemService items, HomeService homes, FamilySyncService sync, UndoService undo)
     {
         _items = items;
+        _homes = homes;
         _undo = undo;
         Filters =
         [
@@ -50,9 +52,15 @@ public sealed partial class HomeViewModel : ObservableObject
             new FilterChip(AppResources.Filter_Other, CategoryGroup.Other),
         ];
         _items.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(() => _ = LoadAsync());
+        _homes.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(() => _ = LoadAsync());
+        sync.Synced += (_, _) => MainThread.BeginInvokeOnMainThread(() => _ = LoadAsync());
     }
 
     public ObservableCollection<FilterChip> Filters { get; }
+
+    /// <summary>The app name, or the home's name when this phone is in more than one home.</summary>
+    [ObservableProperty]
+    public partial string Title { get; set; } = AppResources.AppName;
 
     public ObservableCollection<ItemGroup> Groups { get; } = [];
 
@@ -68,7 +76,9 @@ public sealed partial class HomeViewModel : ObservableObject
     public async Task LoadAsync()
     {
         var group = Filters.First(f => f.IsSelected).Group;
-        var sections = ItemLists.ForHome(await _items.GetOpenAsync(), group);
+        var home = await _homes.GetCurrentAsync();
+        Title = (await _homes.GetHomesAsync()).Count > 1 ? home.Name : AppResources.AppName;
+        var sections = ItemLists.ForHome(await _items.GetOpenAsync(home.Id), group);
 
         Groups.Clear();
         AddGroup(AppResources.Section_Expired, Palette.Expired, sections.Expired);
@@ -163,4 +173,7 @@ public sealed partial class HomeViewModel : ObservableObject
 
     [RelayCommand]
     private Task SettingsAsync() => Shell.Current.GoToAsync("settings");
+
+    [RelayCommand]
+    private Task FamilyAsync() => Shell.Current.GoToAsync("family");
 }

@@ -15,6 +15,17 @@ public static class Text
 
     public static string Category(string categoryId) => Get("Category_" + categoryId.Replace('-', '_'));
 
+    /// <summary>"just now", "5 min ago", "3 hours ago", "2 days ago".</summary>
+    public static string Ago(TimeSpan elapsed) => elapsed switch
+    {
+        { TotalMinutes: < 2 } => AppResources.Ago_JustNow,
+        { TotalHours: < 1 } => string.Format(AppResources.Ago_Minutes, (int)elapsed.TotalMinutes),
+        { TotalHours: < 2 } => AppResources.Ago_OneHour,
+        { TotalDays: < 1 } => string.Format(AppResources.Ago_Hours, (int)elapsed.TotalHours),
+        { TotalDays: < 2 } => AppResources.Ago_OneDay,
+        _ => string.Format(AppResources.Ago_Days, (int)elapsed.TotalDays),
+    };
+
     public static string Date(DateOnly date) => date.ToString("d MMM yyyy", CultureInfo.CurrentCulture);
 
     public static string Status(ItemEvaluation evaluation)

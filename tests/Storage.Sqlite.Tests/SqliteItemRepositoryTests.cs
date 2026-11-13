@@ -117,4 +117,39 @@ public sealed class SqliteItemRepositoryTests : IAsyncLifetime
         Assert.Equal("Milk (opened)", (await _repository.GetAsync(item.Id))?.Name);
         Assert.Single(await _repository.GetEverythingAsync());
     }
+
+    [Fact]
+    public async Task Purge_removes_only_that_homes_items()
+    {
+        await _repository.SaveAsync(Item("Milk") with { HomeId = "amma" });
+        await _repository.SaveAsync(Item("Bread") with { HomeId = "mine" });
+
+        await _repository.PurgeHomeAsync("amma");
+
+        Assert.Equal(["Bread"], (await _repository.GetEverythingAsync()).Select(i => i.Name));
+        Assert.Equal("mine", (await _repository.GetEverythingAsync())[0].HomeId);
+    }
+
+    [Fact]
+    public async Task Homes_and_family_phones_are_stored_with_their_keys()
+    {
+        await using var homes = new HomeTracker.Storage.Sqlite.SqliteHomeRepository(_path);
+        var now = new DateTimeOffset(2026, 11, 14, 9, 0, 0, TimeSpan.Zero);
+        var home = HomeTracker.Core.Households.Home.CreateLocal("Amma's house", now).StartSharing();
+        await homes.SaveHomeAsync(home);
+        await homes.SaveDeviceAsync(new HomeTracker.Core.Households.FamilyDevice(home.Id, "d1", "Appa's phone", now));
+        await homes.SaveDeviceAsync(new HomeTracker.Core.Households.FamilyDevice(home.Id, "d1", "Appa's phone", now.AddHours(1), now));
+
+        var loaded = Assert.Single(await homes.GetHomesAsync());
+        Assert.Equal(home.Key, loaded.Key);
+        Assert.Equal(home.Topic, loaded.Topic);
+        Assert.Equal(now, loaded.CreatedAt);
+        var device = Assert.Single(await homes.GetDevicesAsync(home.Id));
+        Assert.Equal(now.AddHours(1), device.LastSeen);
+        Assert.Equal(now, device.SilentAlertSent);
+
+        await homes.DeleteHomeAsync(home.Id);
+        Assert.Empty(await homes.GetHomesAsync());
+        Assert.Empty(await homes.GetDevicesAsync(home.Id));
+    }
 }

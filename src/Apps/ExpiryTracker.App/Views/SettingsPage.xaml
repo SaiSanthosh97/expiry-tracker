@@ -10,6 +10,9 @@
     <ScrollView>
         <VerticalStackLayout Padding="16,8,16,32" Spacing="10">
 
+            <!-- Family -->
+            <Button Text="{x:Static s:AppResources.Settings_Family}" Command="{Binding OpenFamilyCommand}" FontSize="20" HeightRequest="64" />
+
             <!-- Keep reminders working -->
             <Label Text="{x:Static s:AppResources.Settings_Reminders}" Style="{StaticResource SectionLabel}" FontSize="22" />
 

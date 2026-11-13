@@ -13,6 +13,10 @@ public sealed class Dialogs
     public Task<bool> ConfirmAsync(string title, string message, string accept, string cancel) =>
         Page.DisplayAlertAsync(title, message, accept, cancel);
 
+    /// <returns>The typed text, or null when cancelled.</returns>
+    public Task<string?> PromptAsync(string title, string message, string? initialValue = null) =>
+        Page.DisplayPromptAsync(title, message, AppResources.Common_OK, AppResources.Common_Cancel, initialValue: initialValue ?? "", maxLength: 2000);
+
     /// <returns>The chosen option, or null when cancelled.</returns>
     public async Task<string?> ChooseAsync(string title, params string[] options)
     {

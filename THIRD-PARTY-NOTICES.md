@@ -7,6 +7,7 @@ Dependencies shipped in the app, with their licenses. Checked at every release.
 | .NET runtime and libraries | All | MIT |
 | .NET MAUI (Microsoft.Maui.Controls) | App | MIT |
 | CommunityToolkit.Mvvm | App | MIT |
+| QRCoder (family invite QR codes) | App | MIT |
 | sqlite-net-pcl (Krueger Systems) | Storage.Sqlite | MIT |
 | SQLitePCLRaw.core, SQLitePCLRaw.provider.e_sqlite3 | Storage.Sqlite | Apache-2.0 |
 | SourceGear.sqlite3 (native SQLite builds) | Storage.Sqlite | SQLite: public domain |
@@ -14,6 +15,12 @@ Dependencies shipped in the app, with their licenses. Checked at every release.
 | Google ML Kit barcode scanning and text recognition (on-device models) | Device.Vision | Free to use under the [ML Kit Terms of Service](https://developers.google.com/ml-kit/terms); closed source |
 | Google Play services client libraries (used by ML Kit) | Device.Vision | [Android Software Development Kit License](https://developer.android.com/studio/terms) |
 | .NET bindings for ML Kit and Play services (Xamarin.Google.MLKit.*, Xamarin.GooglePlayServices.*) by Microsoft | Device.Vision | MIT |
+
+## Services
+
+| Service | Used for | Terms |
+|---|---|---|
+| [ntfy.sh](https://ntfy.sh) (open-source ntfy server, public instance) | Carrying a shared home's changes between family phones. Messages are encrypted on the phone (AES-256-GCM) with a key only the family's phones have; ntfy.sh keeps them for up to 12 hours. No account. The relay address can be changed to a self-hosted ntfy. | Free public service, used within its [terms](https://ntfy.sh/docs/privacy/) and limits (250 messages a day per internet connection) |
 
 ## Data
 

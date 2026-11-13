@@ -7,6 +7,7 @@ using HomeTracker.Core.AppUpdater;
 namespace ExpiryTracker.App.ViewModels;
 
 public sealed partial class SettingsViewModel(
+    HomeService homes,
     AppSettings settings,
     ReminderHealth health,
     ItemService items,
@@ -80,7 +81,9 @@ public sealed partial class SettingsViewModel(
         {
             await using var stream = await file.OpenReadAsync();
             using var reader = new StreamReader(stream);
-            var count = await items.ImportAsync(await reader.ReadToEndAsync());
+            var current = await homes.GetCurrentAsync();
+            var known = (await homes.GetHomesAsync()).Select(h => h.Id).ToHashSet();
+            var count = await items.ImportAsync(await reader.ReadToEndAsync(), current.Id, known);
             await dialogs.AlertAsync(AppResources.Settings_Import, string.Format(AppResources.Import_Done, count));
         }
         catch (FormatException ex)
@@ -111,6 +114,9 @@ public sealed partial class SettingsViewModel(
 
         await OfferUpdateAsync(update, dialogs);
     }
+
+    [RelayCommand]
+    private Task OpenFamilyAsync() => Shell.Current.GoToAsync("family");
 
     [RelayCommand]
     private Task OpenSourceCodeAsync() => Launcher.Default.OpenAsync(UpdateService.RepositoryUrl);

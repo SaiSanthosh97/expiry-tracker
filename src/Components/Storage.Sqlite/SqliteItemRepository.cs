@@ -51,5 +51,11 @@ public sealed class SqliteItemRepository : IItemRepository, IAsyncDisposable
         return rows.Select(r => r.ToItem()).ToList();
     }
 
+    public async Task PurgeHomeAsync(string homeId)
+    {
+        await _initialized.Value;
+        await _connection.ExecuteAsync("DELETE FROM Items WHERE HomeId = ?", homeId);
+    }
+
     public ValueTask DisposeAsync() => new(_connection.CloseAsync());
 }
