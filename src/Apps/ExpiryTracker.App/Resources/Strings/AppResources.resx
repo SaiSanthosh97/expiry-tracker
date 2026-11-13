@@ -113,14 +113,14 @@
   <data name="Settings_CheckUpdates" xml:space="preserve"><value>Check for updates</value></data>
   <data name="Update_AvailableTitle" xml:space="preserve"><value>Update available</value></data>
   <data name="Update_AvailableText" xml:space="preserve"><value>Version {0} is ready. Download it now?</value></data>
-  <data name="Update_InstallHint" xml:space="preserve"><value>When the download finishes, tap it to install. On Samsung, turn off Auto Blocker first (Settings → Security and privacy) and turn it back on afterwards.</value></data>
+  <data name="Update_InstallHint" xml:space="preserve"><value>Home Tracker downloads it and opens Android&apos;s installer: tap Update. Your list is kept. On Samsung, turn off Auto Blocker first (Settings → Security and privacy) and turn it back on afterwards.</value></data>
   <data name="Update_Download" xml:space="preserve"><value>Download</value></data>
   <data name="Update_Later" xml:space="preserve"><value>Later</value></data>
   <data name="Update_None" xml:space="preserve"><value>You have the latest version.</value></data>
   <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates. Check your internet connection.</value></data>
   <data name="Settings_About" xml:space="preserve"><value>About</value></data>
   <data name="About_Disclaimer" xml:space="preserve"><value>Home Tracker only reminds you about dates that you or the pack provide. It does not give medical or food-safety advice. Always follow the label and your doctor or pharmacist.</value></data>
-  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone and not kept. When you scan a barcode, only the barcode number is sent to Open Food Facts to find the product name. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
+  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone. A small copy of each product photo is kept inside the app (not in your gallery) and deleted with the item. When a photo shows a barcode, only the barcode number is sent to Open Food Facts to find the product name. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
   <data name="About_License" xml:space="preserve"><value>Free and open source (MIT License).</value></data>
   <data name="About_SourceCode" xml:space="preserve"><value>Source code on GitHub</value></data>
   <data name="Reminder_Channel" xml:space="preserve"><value>Expiry reminders</value></data>
@@ -134,17 +134,12 @@
   <data name="Welcome_Title" xml:space="preserve"><value>Welcome to Home Tracker</value></data>
   <data name="Welcome_Continue" xml:space="preserve"><value>Continue</value></data>
   <data name="Notifications_Denied" xml:space="preserve"><value>Without notifications the app can&apos;t remind you. You can allow them later in Settings.</value></data>
-  <data name="Scan_Section" xml:space="preserve"><value>Use the camera: photo of the barcode, then of the date</value></data>
-  <data name="Scan_Barcode" xml:space="preserve"><value>📷  Barcode</value></data>
+  <data name="Scan_Section" xml:space="preserve"><value>Take a photo of the product: the app reads its name and date. If the date is on another side, use “Date”.</value></data>
   <data name="Scan_Date" xml:space="preserve"><value>📷  Date</value></data>
-  <data name="Scan_BarcodeTitle" xml:space="preserve"><value>Photo of the barcode</value></data>
   <data name="Scan_DateTitle" xml:space="preserve"><value>Photo of the date on the pack</value></data>
   <data name="Scan_TakePhoto" xml:space="preserve"><value>Take a photo</value></data>
   <data name="Scan_ChoosePhoto" xml:space="preserve"><value>Choose a photo</value></data>
   <data name="Scan_Reading" xml:space="preserve"><value>Reading the photo…</value></data>
-  <data name="Scan_NoBarcode" xml:space="preserve"><value>No barcode found. Try again with the barcode filling most of the photo.</value></data>
-  <data name="Scan_ProductNotFound" xml:space="preserve"><value>Product not in the free product list. Type its name – it will be remembered next time you scan it.</value></data>
-  <data name="Scan_Offline" xml:space="preserve"><value>Could not look up the product (no internet). Type its name – it will be remembered next time.</value></data>
   <data name="Scan_FromOpenFoodFacts" xml:space="preserve"><value>Product details from Open Food Facts</value></data>
   <data name="Scan_Remembered" xml:space="preserve"><value>Remembered from an earlier scan</value></data>
   <data name="Scan_DateConfirm" xml:space="preserve"><value>The pack says the last day is {0}. Is that right?</value></data>
@@ -152,4 +147,28 @@
   <data name="Scan_No" xml:space="preserve"><value>No, I&apos;ll set it</value></data>
   <data name="Scan_NoDate" xml:space="preserve"><value>Couldn&apos;t read a date. Try again with the date filling the photo in good light, or set it below.</value></data>
   <data name="Scan_CameraUnavailable" xml:space="preserve"><value>The camera can&apos;t be opened. Choose a photo instead.</value></data>
+  <data name="Scan_Photo" xml:space="preserve"><value>📷  Photo</value></data>
+  <data name="Scan_PhotoTitle" xml:space="preserve"><value>Photo of the product</value></data>
+  <data name="Scan_NameFromLabel" xml:space="preserve"><value>Name read from the pack – please check it</value></data>
+  <data name="Scan_NothingRead" xml:space="preserve"><value>Photo saved. Couldn&apos;t read the name or date – please type them below.</value></data>
+  <data name="Scan_RemovePhoto" xml:space="preserve"><value>Remove photo</value></data>
+  <data name="Item_PhotoHint" xml:space="preserve"><value>Tap the photo to see it bigger</value></data>
+  <data name="Widget_Used" xml:space="preserve"><value>Used</value></data>
+  <data name="Widget_Add" xml:space="preserve"><value>+ Add</value></data>
+  <data name="Widget_AllGood" xml:space="preserve"><value>All good ✓</value></data>
+  <data name="Widget_OneNeedsAttention" xml:space="preserve"><value>1 needs attention</value></data>
+  <data name="Widget_ManyNeedAttention" xml:space="preserve"><value>{0} need attention</value></data>
+  <data name="Widget_Empty" xml:space="preserve"><value>Nothing to remind you about. Tap + Add to add an item.</value></data>
+  <data name="Widget_UsedToast" xml:space="preserve"><value>{0}: marked as used up. To undo, open Home Tracker within 5 minutes.</value></data>
+  <data name="Update_Title" xml:space="preserve"><value>Updating Home Tracker</value></data>
+  <data name="Update_Downloading" xml:space="preserve"><value>Downloading version {0}…</value></data>
+  <data name="Update_Progress" xml:space="preserve"><value>{0}% done</value></data>
+  <data name="Update_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Update_AllowTitle" xml:space="preserve"><value>One-time permission</value></data>
+  <data name="Update_AllowText" xml:space="preserve"><value>Android needs your permission to install updates from Home Tracker. On the next screen, turn on “Allow from this source”, then come back here.</value></data>
+  <data name="Update_AllowButton" xml:space="preserve"><value>Open the setting</value></data>
+  <data name="Update_InstallButton" xml:space="preserve"><value>Install now</value></data>
+  <data name="Update_Ready" xml:space="preserve"><value>Downloaded. Tap “Install now”, then Update on Android&apos;s screen.</value></data>
+  <data name="Update_Damaged" xml:space="preserve"><value>The download was damaged, so it was not installed. Please try again.</value></data>
+  <data name="Update_DownloadFailed" xml:space="preserve"><value>The download stopped. Check your internet connection and try again.</value></data>
 </root>

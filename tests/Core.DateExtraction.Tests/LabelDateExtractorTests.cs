@@ -18,6 +18,14 @@ public class LabelDateExtractorTests
     [InlineData("EXP 05MAY2027", 2027, 5, 5)]
     [InlineData("exp. date (MM/YY): 09/27", 2027, 9, 30)]
     [InlineData("EXP 2027-04-30", 2027, 4, 30)]
+    [InlineData("EX 05/2027", 2027, 5, 31)]
+    [InlineData("EX: 12.26", 2026, 12, 31)]
+    [InlineData("EX.DT. 03/28", 2028, 3, 31)]
+    [InlineData("EXP05/2027", 2027, 5, 31)]
+    [InlineData("EX10.2027", 2027, 10, 31)]
+    [InlineData("EXPY 08 2027", 2027, 8, 31)]
+    [InlineData("E.D. 15/09/2027", 2027, 9, 15)]
+    [InlineData("Best before 01.27", 2027, 1, 31)]
     public void Reads_labelled_expiry_with_high_confidence(string text, int year, int month, int day)
     {
         var result = Extractor.Extract(text);
@@ -153,6 +161,17 @@ public class LabelDateExtractorTests
     }
 
     [Fact]
+    public void Dotted_month_year_after_expiry_label_is_read_but_dotted_numbers_elsewhere_are_not()
+    {
+        var result = Extractor.Extract("MRP 45.00 NET WT 10.25 KG" + "\n" + "MFG 06.26 EX 05.27");
+
+        Assert.Equal(new DateOnly(2027, 5, 31), result.ExpiryLastUsableDay);
+        Assert.Equal(new DateOnly(2026, 6, 1), result.Manufacture?.Date);
+        Assert.Equal(ExtractionConfidence.High, result.Confidence);
+        Assert.Equal(2, result.AllDates.Count);
+    }
+
+    [Fact]
     public void Manufacture_date_alone_gives_no_expiry()
     {
         var result = Extractor.Extract("MFD 01/2026");
@@ -170,6 +189,9 @@ public class LabelDateExtractorTests
     [InlineData("EXP 13/2027")]
     [InlineData("EXP 31/02/2027")]
     [InlineData("EXP 05/1990")]
+    [InlineData("Price 10.25")]
+    [InlineData("Net wt 12 2027 g")]
+    [InlineData("Excellent taste")]
     public void Returns_nothing_when_no_valid_date(string? text)
     {
         var result = Extractor.Extract(text);

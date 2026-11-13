@@ -9,7 +9,10 @@ using HomeTracker.Core.ShelfLife;
 
 namespace ExpiryTracker.App.ViewModels;
 
-public sealed record ItemCard(string Id, string Name, string Details, string StatusText, Color StatusColor);
+public sealed record ItemCard(string Id, string Name, string Details, string StatusText, Color StatusColor, ImageSource? Photo)
+{
+    public bool HasPhoto => Photo is not null;
+}
 
 public sealed class ItemGroup(string title, Color color, IEnumerable<ItemCard> cards) : List<ItemCard>(cards)
 {
@@ -99,12 +102,12 @@ public sealed partial class HomeViewModel : ObservableObject
         }
 
         var color = e.Status.State == ExpiryState.Unknown ? Palette.NoDate : Text.StatusColor(e.Status.State);
-        return new ItemCard(e.Item.Id, e.Item.Name, details, Text.Status(e), color);
+        return new ItemCard(e.Item.Id, e.Item.Name, details, Text.Status(e), color, PhotoStore.ImageOf(e.Item.PhotoPath));
     }
 
     private void ShowPendingUndo()
     {
-        if (_undo.Take() is not { } pending || pending.ItemId == _undoItemId)
+        if (_undo.Take() is not { } pending || (HasUndo && pending.ItemId == _undoItemId))
         {
             return;
         }
@@ -122,11 +125,11 @@ public sealed partial class HomeViewModel : ObservableObject
             TaskScheduler.Default);
     }
 
+    // Only hides the bar: an action from the widget stays undoable for a few minutes (UndoService expires it).
     private void HideUndo()
     {
         UndoMessage = null;
         _undoItemId = null;
-        _undo.Clear();
     }
 
     [RelayCommand]
@@ -136,6 +139,7 @@ public sealed partial class HomeViewModel : ObservableObject
         {
             _undoTimer?.Cancel();
             HideUndo();
+            _undo.Clear();
             await _items.ReopenAsync(id);
         }
     }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hometracker_widget_background">#191C1C</color>
+    <color name="hometracker_widget_row">#252B2B</color>
+    <color name="hometracker_widget_text">#E0E3E3</color>
+    <color name="hometracker_widget_accent">#4CDADA</color>
+    <color name="hometracker_widget_on_accent">#003738</color>
+</resources>

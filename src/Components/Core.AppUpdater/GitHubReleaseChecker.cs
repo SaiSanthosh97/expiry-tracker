@@ -5,7 +5,9 @@ using System.Text.Json;
 namespace HomeTracker.Core.AppUpdater;
 
 /// <param name="DownloadUrl">Direct link to the installer file attached to the release.</param>
-public sealed record AvailableUpdate(Version Version, string TagName, Uri DownloadUrl, Uri ReleasePageUrl, string? Notes);
+/// <param name="Sha256">The file's SHA-256 as published by GitHub (lowercase hex), when available.</param>
+/// <param name="Size">File size in bytes, when known.</param>
+public sealed record AvailableUpdate(Version Version, string TagName, Uri DownloadUrl, Uri ReleasePageUrl, string? Notes, string? Sha256 = null, long? Size = null);
 
 /// <summary>
 /// Checks a public GitHub repository's latest release (drafts and pre-releases are ignored by GitHub)
@@ -69,12 +71,34 @@ public sealed class GitHubReleaseChecker
                     ? p
                     : new Uri($"https://github.com/{_owner}/{_repo}/releases");
                 var notes = release.TryGetProperty("body", out var body) ? body.GetString() : null;
-                return new AvailableUpdate(version, tag, downloadUrl, page, notes);
+                return new AvailableUpdate(version, tag, downloadUrl, page, notes, Sha256Of(asset), SizeOf(asset));
             }
         }
 
         return null;
     }
+
+    /// <summary>GitHub lists each release file's checksum as "digest": "sha256:&lt;hex&gt;".</summary>
+    private static string? Sha256Of(JsonElement asset)
+    {
+        if (!asset.TryGetProperty("digest", out var digest) || digest.ValueKind != JsonValueKind.String)
+        {
+            return null;
+        }
+
+        var value = digest.GetString() ?? "";
+        const string prefix = "sha256:";
+        if (!value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        var hex = value[prefix.Length..].ToLowerInvariant();
+        return hex.Length == 64 && hex.All(Uri.IsHexDigit) ? hex : null;
+    }
+
+    private static long? SizeOf(JsonElement asset) =>
+        asset.TryGetProperty("size", out var size) && size.TryGetInt64(out var bytes) && bytes > 0 ? bytes : null;
 
     /// <summary>Accepts tags like "v1.2.0", "1.2" or "v1.2.0-beta" (suffix ignored).</summary>
     public static bool TryParseVersion(string tag, out Version version)

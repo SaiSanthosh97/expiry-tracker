@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Apps can override any of these by defining a resource with the same name. -->
+<resources>
+    <string name="hometracker_widget_label">Home Tracker</string>
+    <string name="hometracker_widget_description">Items that need attention, with a button to mark each one</string>
+    <color name="hometracker_widget_background">#F7FAFA</color>
+    <color name="hometracker_widget_row">#FFFFFF</color>
+    <color name="hometracker_widget_text">#1A1C1C</color>
+    <color name="hometracker_widget_accent">#00696B</color>
+    <color name="hometracker_widget_on_accent">#FFFFFF</color>
+</resources>

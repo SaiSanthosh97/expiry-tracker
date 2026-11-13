@@ -19,11 +19,12 @@ Product requirements: [`# Medicine Tracking & Adherence Platform.md`](%23%20Medi
 | [`Core.ExpiryEngine`](src/Components/Core.ExpiryEngine) | Works out the effective expiry and status (fresh / use soon / expired) |
 | [`Core.Items`](src/Components/Core.Items) | Tracked items, actions (opened, used up, thrown, undo, snooze), home-screen and reminder lists, export/import file format |
 | [`Storage.Sqlite`](src/Components/Storage.Sqlite) | Stores items in a local SQLite database |
-| [`Core.AppUpdater`](src/Components/Core.AppUpdater) | Checks a GitHub repository's latest release for a newer installer |
+| [`Core.AppUpdater`](src/Components/Core.AppUpdater) | Checks a GitHub repository's latest release for a newer installer and downloads it, verified against GitHub's published SHA-256 |
 | [`Device.Reminders`](src/Components/Device.Reminders) | Android daily reminder: schedule, grouped notification with action buttons, restore after restart, battery-saver checks |
-| [`Core.LabelCapture`](src/Components/Core.LabelCapture) | Reads a pack photo: product barcode (with check-digit validation) and printed dates, through `IBarcodeReader` / `ITextReader` |
+| [`Core.LabelCapture`](src/Components/Core.LabelCapture) | Reads a pack photo: product barcode (with check-digit validation), a suggested product name (the largest text) and printed dates, through `IBarcodeReader` / `ITextReader` |
 | [`Core.ProductCatalog`](src/Components/Core.ProductCatalog) | Product lookup by barcode from several sources in order (e.g. household history, then Open Food Facts) |
-| [`Device.Vision`](src/Components/Device.Vision) | Android implementations of `IBarcodeReader` and `ITextReader` using Google ML Kit, on the phone |
+| [`Device.Vision`](src/Components/Device.Vision) | Android implementations of `IBarcodeReader` and `ITextReader` using Google ML Kit, on the phone; `PhotoShrinker` saves small, upright copies of photos |
+| [`Device.HomeWidget`](src/Components/Device.HomeWidget) | Android home-screen widget: a header, up to three rows with a coloured status and an action button, and an Add button |
 
 Each component is a library with no dependency on the app, so it can be referenced by other .NET projects. `Core.*` and `Storage.*` are plain .NET; `Device.*` contain platform code.
 

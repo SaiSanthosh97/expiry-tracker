@@ -124,8 +124,8 @@ public sealed partial class SettingsViewModel(
             AppResources.Update_Later);
         if (download)
         {
-            // The browser downloads the APK from GitHub; Android's installer then asks the user to confirm.
-            await Launcher.Default.OpenAsync(update.DownloadUrl);
+            // Downloaded inside the app and checked; Android's installer then asks the user to confirm.
+            await Views.UpdatePage.ShowAsync(update);
         }
     }
 }

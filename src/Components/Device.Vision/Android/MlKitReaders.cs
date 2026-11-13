@@ -55,14 +55,31 @@ public sealed class MlKitBarcodeReader : IBarcodeReader
 /// <summary>Reads printed Latin-script text (English and numbers) from a photo with Google ML Kit, on the phone.</summary>
 public sealed class MlKitTextReader : ITextReader
 {
-    public async Task<string> ReadAsync(string imagePath, CancellationToken cancellationToken = default)
+    public async Task<TextReading> ReadAsync(string imagePath, CancellationToken cancellationToken = default)
     {
         using var image = MlKitBarcodeReader.LoadImage(imagePath);
         using var recognizer = TextRecognition.GetClient(TextRecognizerOptions.DefaultOptions);
         try
         {
-            var result = await recognizer.Process(image).AsTask().WaitAsync(cancellationToken);
-            return result?.JavaCast<Text>()?.GetText() ?? "";
+            var result = (await recognizer.Process(image).AsTask().WaitAsync(cancellationToken))?.JavaCast<Text>();
+            if (result is null)
+            {
+                return TextReading.Empty;
+            }
+
+            var lines = new List<TextLine>();
+            foreach (var block in result.TextBlocks)
+            {
+                foreach (var line in block.Lines)
+                {
+                    if (line.BoundingBox is { } box && !string.IsNullOrWhiteSpace(line.Text))
+                    {
+                        lines.Add(new TextLine(line.Text, box.Left, box.Top, box.Width(), box.Height()));
+                    }
+                }
+            }
+
+            return new TextReading(result.GetText() ?? "", lines);
         }
         finally
         {

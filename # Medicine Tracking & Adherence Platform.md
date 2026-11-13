@@ -275,6 +275,7 @@ Each family member chooses per Home / per person: **All alerts · Only missed do
 | **0. Setup** | Install free tooling (MAUI workload, Android SDK, Microsoft OpenJDK); repo and component projects; MIT license; dependency license check |
 | **1. Android – single phone** | Manual add, presets, opened, home screen, used/thrown, local reminders, Samsung "keep reminders working" screen, export/import file, **in-app update check** (so you can ship updates from the start) |
 | **2. Camera** | Barcode scan (ML Kit), expiry date reading (ML Kit text recognition + DateExtraction), Open Food Facts lookup |
+| **2.1 Photos, widget, in-app update** (v0.3.0) | One product photo kept per item (shown on the item and the home list) and read for barcode, product name (largest text) and dates; "EX" / dotted month-year dates; home-screen widget (top 3 items, Used button, Add); updates downloaded in the app, checked against GitHub's SHA-256, then installed by Android's installer |
 | **3. Family** | QR pairing, Wi-Fi sync, **encrypted ntfy relay** for away-from-home sync, **remote expiry alerts**, check-ins / "phone silent" alert |
 | **4. Medicines (Module 2)** | Dose schedules, TAKEN/LATER/SKIP, exact alarms, dose stock, **missed-dose remote alerts** (ntfy + optional SMS fallback) |
 | **5. Windows** | Windows build; ZXing.Net + Windows OCR implementations |

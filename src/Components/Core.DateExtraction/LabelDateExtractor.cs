@@ -35,7 +35,10 @@ public sealed partial class LabelDateExtractor
         var normalized = Normalize(text);
 
         var (bestBefore, afterOpening, masked) = ExtractRelativeShelfLife(normalized);
-        var dates = AssignRoles(masked, FindDates(masked));
+        var needLabel = new HashSet<int>();
+        var dates = AssignRoles(masked, FindDates(masked, needLabel))
+            .Where(d => d.Role != DateRole.Unknown || !needLabel.Contains(d.Index))
+            .ToList();
 
         return Combine(dates, bestBefore, afterOpening);
     }
@@ -50,7 +53,7 @@ public sealed partial class LabelDateExtractor
         upper = FormatHintRegex().Replace(upper, m => new string(' ', m.Length));
 
         // Common OCR mix-ups inside numeric dates: O→0, I/L→1 ("05/2O27").
-        return NumericRunRegex().Replace(upper, m =>
+        upper = NumericRunRegex().Replace(upper, m =>
         {
             var run = m.Value;
             if (run.Count(char.IsAsciiDigit) < 2)
@@ -60,6 +63,9 @@ public sealed partial class LabelDateExtractor
 
             return run.Replace('O', '0').Replace('I', '1').Replace('L', '1');
         });
+
+        // Labels and dates are often printed or read without a space ("EXP05/27", "EX.DT.12/26").
+        return LetterDigitJoinRegex().Replace(upper, " ");
     }
 
     private static (ShelfLifeDuration? BestBefore, ShelfLifeDuration? AfterOpening, string Masked) ExtractRelativeShelfLife(string text)
@@ -117,7 +123,12 @@ public sealed partial class LabelDateExtractor
     private static ShelfLifeDuration Earliest(ShelfLifeDuration? current, ShelfLifeDuration candidate) =>
         current is { } existing && existing.ApproximateDays <= candidate.ApproximateDays ? existing : candidate;
 
-    private List<LabelDate> FindDates(string text)
+    /// <summary>
+    /// Finds dates. Month/year written with a dot or a space ("05.27", "05 2027") is also how prices
+    /// and weights look, so those are returned in <paramref name="needLabel"/> and kept only when a label
+    /// such as EXP or MFG sits right before them.
+    /// </summary>
+    private List<LabelDate> FindDates(string text, HashSet<int> needLabel)
     {
         var today = _today();
         var dates = new List<LabelDate>();
@@ -133,6 +144,10 @@ public sealed partial class LabelDateExtractor
             if (date is not null)
             {
                 dates.Add(date);
+                if (date.Precision == DatePrecision.Month && !match.Groups["mon"].Success && match.Groups["sep"].Value is not ("/" or "-"))
+                {
+                    needLabel.Add(date.Index);
+                }
             }
         }
 
@@ -165,12 +180,6 @@ public sealed partial class LabelDateExtractor
 
         if (!groups["d"].Success)
         {
-            // Month/year only. Two-part numbers separated by '.' are too often prices or weights ("10.25").
-            if (!groups["mon"].Success && groups["sep"].Value == ".")
-            {
-                return null;
-            }
-
             return month is >= 1 and <= 12
                 ? new LabelDate(DateRole.Unknown, new DateOnly(year, month, 1), DatePrecision.Month, match.Index, match.Value)
                 : null;
@@ -389,7 +398,7 @@ public sealed partial class LabelDateExtractor
     private static partial Regex RelativeFromEventRegex();
 
     [GeneratedRegex(
-        @"(?<exp>\bEXP(?:IRY|IRES|IRATION)?\b\.?(?:\s*(?:DATE|DT|ON)\b\.?)?|\bUSE\s*BY\b|\bUSE\s*BEFORE\b|\bBEST\s*BEFORE(?:\s*END)?\b|\bBB[DE]?\b)" +
+        @"(?<exp>\b(?:EXP(?:IRY|IRES|IRATION|Y)?|EX|E\.D|ED)\b\.?(?:\s*(?:DATE|DT|ON)\b\.?)?|\bUSE\s*BY\b|\bUSE\s*BEFORE\b|\bBEST\s*BEFORE(?:\s*END)?\b|\bBB[DE]?\b)" +
         @"|(?<mfg>\b(?:MFG|MFD|MFR|MNF|MANF|MANUFACTURED|MANUFACTURING|MANUFACTURE|PKD|PACKED|PKG|PACKAGED|PACKING|DOM|D\.O\.M)\b\.?(?:\s*(?:DATE|DT|ON)\b\.?)?)")]
     private static partial Regex LabelRegex();
 
@@ -398,8 +407,12 @@ public sealed partial class LabelDateExtractor
         @"|\b(?<d>\d{1,2})\s*(?<sep>[\/\.\-])\s*(?<m>\d{1,2})\s*\k<sep>\s*(?<y>\d{4}|\d{2})\b" +
         @"|\b(?<d>\d{1,2})\s*[\/\.\-\s]?\s*(?<mon>" + MonthNames + @")(?![A-Z])\.?\s*[\/\.\-\s,']?\s*(?<y>\d{4}|\d{2})\b" +
         @"|\b(?<mon>" + MonthNames + @")(?![A-Z])\.?\s*[\/\.\-\s,']?\s*(?<y>\d{4}|\d{2})\b" +
-        @"|\b(?<m>\d{1,2})\s*(?<sep>[\/\.\-])\s*(?<y>\d{4}|\d{2})\b")]
+        @"|\b(?<m>\d{1,2})\s*(?<sep>[\/\.\-])\s*(?<y>\d{4}|\d{2})\b" +
+        @"|\b(?<m>\d{1,2})(?<sep>\s+)(?<y>20\d{2})\b")]
     private static partial Regex DateRegex();
+
+    [GeneratedRegex(@"(?<=[A-Z])(?=\d)|(?<=\d)(?=[A-Z])")]
+    private static partial Regex LetterDigitJoinRegex();
 
     [GeneratedRegex(@"(?:RS|INR|MRP|PRICE|₹)\W*$")]
     private static partial Regex PriceMarkerRegex();

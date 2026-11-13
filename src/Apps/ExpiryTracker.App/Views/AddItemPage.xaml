@@ -37,12 +37,17 @@
         <ScrollView>
             <VerticalStackLayout Padding="16,8,16,24">
 
-                <!-- Camera first: one photo of the barcode, one of the date. -->
+                <!-- Camera first: a photo of the product (kept), and if needed one of the date. -->
                 <Border Style="{StaticResource Card}" Padding="14" Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="10">
                         <Label Text="{x:Static s:AppResources.Scan_Section}" FontFamily="OpenSansSemibold" />
+                        <Border IsVisible="{Binding HasPhoto}" StrokeThickness="0" StrokeShape="RoundRectangle 12" HeightRequest="180" BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
+                            <Image Source="{Binding Photo}" Aspect="AspectFit" />
+                        </Border>
+                        <Button Text="{x:Static s:AppResources.Scan_RemovePhoto}" Command="{Binding RemovePhotoCommand}"
+                                IsVisible="{Binding HasPhoto}" Style="{StaticResource OutlineButton}" />
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <Button Grid.Column="0" Text="{x:Static s:AppResources.Scan_Barcode}" Command="{Binding ScanBarcodeCommand}" FontSize="18" />
+                            <Button Grid.Column="0" Text="{x:Static s:AppResources.Scan_Photo}" Command="{Binding TakeProductPhotoCommand}" FontSize="18" />
                             <Button Grid.Column="1" Text="{x:Static s:AppResources.Scan_Date}" Command="{Binding ReadDateCommand}" FontSize="18" />
                         </Grid>
                     </VerticalStackLayout>

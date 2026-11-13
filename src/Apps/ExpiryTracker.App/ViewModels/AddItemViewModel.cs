@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using ExpiryTracker.App.Resources.Strings;
 using ExpiryTracker.App.Services;
 using HomeTracker.Core.Items;
+using HomeTracker.Core.LabelCapture;
 using HomeTracker.Core.ShelfLife;
 
 namespace ExpiryTracker.App.ViewModels;
@@ -43,6 +44,7 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
     private bool _loading;
     private string? _barcode;
     private ShelfLifeDuration? _afterOpeningFromLabel;
+    private string? _originalPhoto;
 
     public AddItemViewModel(ItemService items, ShelfLifeCatalog catalog, Dialogs dialogs, ScanService scan)
     {
@@ -88,6 +90,15 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
 
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
+
+    /// <summary>File name of the item's photo (see <see cref="PhotoStore"/>).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Photo), nameof(HasPhoto))]
+    public partial string? PhotoFile { get; set; }
+
+    public ImageSource? Photo => PhotoStore.ImageOf(PhotoFile);
+
+    public bool HasPhoto => Photo is not null;
 
     // Exactly one of the three date modes is on; RadioButtons bind to these.
     [ObservableProperty]
@@ -155,6 +166,8 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
         var item = evaluation.Item;
         _editing = item;
         _barcode = item.Barcode;
+        _originalPhoto = item.PhotoPath;
+        PhotoFile = item.PhotoPath;
         Title = AppResources.Edit_Title;
         Name = item.Name;
         Quantity = item.Quantity;
@@ -328,6 +341,7 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
             CategoryId = category.Id,
             Quantity = Quantity,
             Barcode = _barcode,
+            PhotoPath = PhotoFile,
             AfterOpening = _afterOpeningFromLabel ?? _editing?.AfterOpening,
             PrintedExpiry = null,
             ManufactureDate = null,
@@ -376,55 +390,100 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
         }
 
         await _items.SaveAsync(BuildItem());
+        if (_originalPhoto != PhotoFile)
+        {
+            PhotoStore.Delete(_originalPhoto);
+        }
+
         await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
-    private async Task ScanBarcodeAsync()
+    private void RemovePhoto() => ReplacePhoto(null);
+
+    /// <summary>Photos taken on this screen are deleted when replaced; the saved one only after Save.</summary>
+    private void ReplacePhoto(string? newFile)
     {
-        var photo = await _scan.GetPhotoAsync(AppResources.Scan_BarcodeTitle);
+        if (PhotoFile is { } current && current != _originalPhoto)
+        {
+            PhotoStore.Delete(current);
+        }
+
+        PhotoFile = newFile;
+    }
+
+    /// <summary>
+    /// One photo of the product: kept so the item is easy to recognise, and read for the barcode
+    /// (product name from history or Open Food Facts), the name printed on the pack and any dates.
+    /// </summary>
+    [RelayCommand]
+    private async Task TakeProductPhotoAsync()
+    {
+        var photo = await _scan.GetPhotoAsync(AppResources.Scan_PhotoTitle);
         if (photo is null)
         {
             return;
         }
 
+        PackReading? reading = null;
         try
         {
             IsBusy = true;
-            var code = await _scan.ReadBarcodeAsync(photo);
-            if (code is null)
-            {
-                IsBusy = false;
-                await _dialogs.AlertAsync(AppResources.Scan_BarcodeTitle, AppResources.Scan_NoBarcode);
-                return;
-            }
-
-            _barcode = code;
-            var result = await _scan.LookupAsync(code);
-            IsBusy = false;
-
-            if (result.Product is not { } product)
-            {
-                ScanNote = result.SomeSourcesUnavailable ? AppResources.Scan_Offline : AppResources.Scan_ProductNotFound;
-                return;
-            }
-
-            Name = product.Name;
-            ScanNote = product.Source == HomeTracker.Core.ProductCatalog.ProductSource.OpenFoodFacts
-                ? AppResources.Scan_FromOpenFoodFacts
-                : AppResources.Scan_Remembered;
-
-            if (product.CategoryId is { } categoryId && Categories.FirstOrDefault(c => c.Category.Id == categoryId) is { } chip)
-            {
-                // Don't let the category's defaults overwrite a date the user already set or scanned.
-                var noDateChosenYet = MonthIndex < 0 && MadeMonthIndex < 0;
-                SelectCategory(chip, applyDefaults: _editing is null && noDateChosenYet);
-            }
+            ReplacePhoto(await PhotoStore.KeepAsync(photo));
+            reading = await _scan.ReadPackAsync(photo);
+            await FillNameAsync(reading);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            // Reading is a convenience; the photo and the form still work without it.
+            System.Diagnostics.Debug.WriteLine($"Reading the photo failed: {ex}");
         }
         finally
         {
             IsBusy = false;
             ScanService.Discard(photo);
+        }
+
+        if (reading is not null && await ApplyDatesAsync(reading.Dates, askWhenMissing: false))
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            ScanNote = AppResources.Scan_NothingRead;
+        }
+    }
+
+    private async Task FillNameAsync(PackReading reading)
+    {
+        if (reading.Barcode is { } code)
+        {
+            _barcode = code;
+            var result = await _scan.LookupAsync(code);
+            if (result.Product is { } product)
+            {
+                Name = product.Name;
+                ScanNote = product.Source == HomeTracker.Core.ProductCatalog.ProductSource.OpenFoodFacts
+                    ? AppResources.Scan_FromOpenFoodFacts
+                    : AppResources.Scan_Remembered;
+
+                if (product.CategoryId is { } categoryId && Categories.FirstOrDefault(c => c.Category.Id == categoryId) is { } chip)
+                {
+                    // Don't let the category's defaults overwrite a date the user already set or scanned.
+                    var noDateChosenYet = MonthIndex < 0 && MadeMonthIndex < 0;
+                    SelectCategory(chip, applyDefaults: _editing is null && noDateChosenYet);
+                }
+
+                return;
+            }
+        }
+
+        // Never overwrite a name the user typed.
+        if (string.IsNullOrWhiteSpace(Name) && reading.NameGuess is { } guess)
+        {
+            Name = guess;
+            ScanNote = AppResources.Scan_NameFromLabel;
         }
     }
 
@@ -449,21 +508,31 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
             ScanService.Discard(photo);
         }
 
+        await ApplyDatesAsync(dates, askWhenMissing: true);
+    }
+
+    /// <returns>True when a date was found and the user accepted it.</returns>
+    private async Task<bool> ApplyDatesAsync(HomeTracker.Core.DateExtraction.LabelDateResult dates, bool askWhenMissing)
+    {
         if (dates.ExpiryLastUsableDay is not { } last || IndexOfYear(last.Year) < 0)
         {
-            await _dialogs.AlertAsync(AppResources.Scan_DateTitle, AppResources.Scan_NoDate);
-            return;
+            if (askWhenMissing)
+            {
+                await _dialogs.AlertAsync(AppResources.Scan_DateTitle, AppResources.Scan_NoDate);
+            }
+
+            return false;
         }
 
         // Camera reading can be wrong: the user always confirms before the date is used.
         var confirmed = await _dialogs.ConfirmAsync(
-            AppResources.Scan_DateTitle,
+            askWhenMissing ? AppResources.Scan_DateTitle : AppResources.Scan_PhotoTitle,
             string.Format(AppResources.Scan_DateConfirm, Text.Date(last)),
             AppResources.Scan_Yes,
             AppResources.Scan_No);
         if (!confirmed)
         {
-            return;
+            return false;
         }
 
         _afterOpeningFromLabel = dates.AfterOpening;
@@ -477,5 +546,7 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
             SetPackDate(last, hasDay: dates.Expiry?.Precision == HomeTracker.Core.DateExtraction.DatePrecision.Day
                 || last.Day != DateTime.DaysInMonth(last.Year, last.Month));
         }
+
+        return true;
     }
 }

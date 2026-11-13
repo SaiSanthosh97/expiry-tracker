@@ -16,8 +16,17 @@ public interface IBarcodeReader
     Task<IReadOnlyList<ScannedBarcode>> ReadAsync(string imagePath, CancellationToken cancellationToken = default);
 }
 
+/// <summary>One printed line and where it is in the photo (pixels, photo the right way up).</summary>
+public sealed record TextLine(string Text, float Left, float Top, float Width, float Height);
+
+/// <param name="Text">All text, one line per printed line.</param>
+public sealed record TextReading(string Text, IReadOnlyList<TextLine> Lines)
+{
+    public static TextReading Empty { get; } = new("", []);
+}
+
 /// <summary>Reads printed text from a photo, line by line. Implemented per platform.</summary>
 public interface ITextReader
 {
-    Task<string> ReadAsync(string imagePath, CancellationToken cancellationToken = default);
+    Task<TextReading> ReadAsync(string imagePath, CancellationToken cancellationToken = default);
 }

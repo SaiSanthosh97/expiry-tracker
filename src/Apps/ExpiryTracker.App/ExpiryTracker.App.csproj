@@ -31,8 +31,8 @@
 		<!-- Versions -->
 		<!-- ApplicationDisplayVersion must match the GitHub release tag (v0.1.0) for update checks.
 		     ApplicationVersion must go up by one with every release. -->
-		<ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
-		<ApplicationVersion>2</ApplicationVersion>
+		<ApplicationDisplayVersion>0.3.0</ApplicationDisplayVersion>
+		<ApplicationVersion>3</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
@@ -83,6 +83,7 @@
 	  <ProjectReference Include="..\..\Components\Core.LabelCapture\Core.LabelCapture.csproj" />
 	  <ProjectReference Include="..\..\Components\Core.ProductCatalog\Core.ProductCatalog.csproj" />
 	  <ProjectReference Include="..\..\Components\Device.Vision\Device.Vision.csproj" />
+	  <ProjectReference Include="..\..\Components\Device.HomeWidget\Device.HomeWidget.csproj" />
 	</ItemGroup>
 
 </Project>

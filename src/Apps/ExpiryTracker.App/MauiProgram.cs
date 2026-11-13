@@ -7,6 +7,7 @@ using HomeTracker.Core.Items;
 using HomeTracker.Core.LabelCapture;
 using HomeTracker.Core.ProductCatalog;
 using HomeTracker.Core.ShelfLife;
+using HomeTracker.Device.HomeWidget;
 using HomeTracker.Device.Reminders;
 using HomeTracker.Device.Vision;
 using HomeTracker.Storage.Sqlite;
@@ -62,6 +63,8 @@ public static class MauiProgram
 		services.AddSingleton<UndoService>();
 		services.AddSingleton<ScanService>();
 		services.AddSingleton<Dialogs>();
+		services.AddSingleton<PhotoStore>();
+		services.AddSingleton<WidgetSource>();
 
 		// Screens
 		services.AddSingleton<HomeViewModel>();
@@ -72,6 +75,7 @@ public static class MauiProgram
 		services.AddTransient<ItemPage>();
 		services.AddTransient<SettingsViewModel>();
 		services.AddTransient<SettingsPage>();
+		services.AddTransient<UpdatePage>();
 
 		var app = builder.Build();
 
@@ -87,6 +91,12 @@ public static class MauiProgram
 				AppResources.Reminder_UsedUp,
 				AppResources.Reminder_Thrown,
 				AppResources.Reminder_Tomorrow));
+
+		// Home-screen widget: redrawn whenever the list changes.
+		HomeWidget.Initialize(
+			() => app.Services.GetRequiredService<WidgetSource>(),
+			new HomeWidgetOptions(AppResources.Widget_Used, AppResources.Widget_Add));
+		app.Services.GetRequiredService<ItemService>().Changed += (_, _) => HomeWidget.Refresh();
 
 		return app;
 	}

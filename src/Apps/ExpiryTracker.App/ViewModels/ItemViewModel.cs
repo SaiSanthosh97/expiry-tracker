@@ -42,6 +42,12 @@ public sealed partial class ItemViewModel(ItemService items, UndoService undo, D
     [ObservableProperty]
     public partial bool CanMarkOpened { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPhoto))]
+    public partial ImageSource? Photo { get; set; }
+
+    public bool HasPhoto => Photo is not null;
+
     public ObservableCollection<DetailRow> Details { get; } = [];
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -62,6 +68,7 @@ public sealed partial class ItemViewModel(ItemService items, UndoService undo, D
         _evaluation = evaluation;
         var item = evaluation.Item;
         Name = item.Name;
+        Photo = PhotoStore.ImageOf(item.PhotoPath);
         Category = Text.Category(item.CategoryId);
         StatusText = Text.Status(evaluation);
         StatusColor = Text.StatusColor(evaluation.Status.State);
@@ -118,6 +125,16 @@ public sealed partial class ItemViewModel(ItemService items, UndoService undo, D
 
         await items.MarkOpenedAsync(_evaluation.Item.Id, choice);
         await LoadAsync();
+    }
+
+    /// <summary>Opens the photo full screen in the phone's photo viewer, where it can be zoomed.</summary>
+    [RelayCommand]
+    private async Task ViewPhotoAsync()
+    {
+        if (PhotoStore.PathOf(_evaluation?.Item.PhotoPath) is { } path)
+        {
+            await Launcher.Default.OpenAsync(new OpenFileRequest(Name, new ReadOnlyFile(path, "image/jpeg")));
+        }
     }
 
     [RelayCommand]

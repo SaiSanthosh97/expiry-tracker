@@ -10,6 +10,7 @@ public sealed class ReminderSource(ItemService items, AppSettings settings) : ID
     public async Task<ReminderContent?> BuildAsync(DateOnly today)
     {
         settings.LastReminderRun = today;
+        HomeTracker.Device.HomeWidget.HomeWidget.Refresh();
 
         var due = ItemLists.DueForReminder(await items.GetOpenAsync(), today);
         if (due.Count == 0)

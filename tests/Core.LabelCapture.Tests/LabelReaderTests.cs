@@ -12,7 +12,8 @@ public class LabelReaderTests
 
     private sealed class FakeText(string text) : ITextReader
     {
-        public Task<string> ReadAsync(string imagePath, CancellationToken cancellationToken = default) => Task.FromResult(text);
+        public Task<TextReading> ReadAsync(string imagePath, CancellationToken cancellationToken = default) =>
+            Task.FromResult(new TextReading(text, text.Split('\n').Select((l, i) => new TextLine(l, 0, i * 40, 200, 30)).ToList()));
     }
 
     private static LabelReader Reader(string text = "", params ScannedBarcode[] codes) =>

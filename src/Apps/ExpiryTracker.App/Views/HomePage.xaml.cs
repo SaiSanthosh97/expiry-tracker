@@ -11,10 +11,12 @@ public partial class HomePage : ContentPage
     private readonly ReminderHealth _health;
     private readonly UpdateService _updates;
     private readonly Dialogs _dialogs;
+    private readonly PhotoStore _photos;
     private bool _startupDone;
 
-    public HomePage(HomeViewModel viewModel, AppSettings settings, ReminderHealth health, UpdateService updates, Dialogs dialogs)
+    public HomePage(HomeViewModel viewModel, AppSettings settings, ReminderHealth health, UpdateService updates, Dialogs dialogs, PhotoStore photos)
     {
+        _photos = photos;
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
         _settings = settings;
@@ -33,6 +35,8 @@ public partial class HomePage : ContentPage
             _startupDone = true;
             await RunStartupAsync();
         }
+
+        await WidgetNavigation.GoAsync();
     }
 
     /// <summary>First-run welcome, reminder scheduling and the daily update check.</summary>
@@ -50,6 +54,10 @@ public partial class HomePage : ContentPage
         }
 
         await _health.ScheduleAndCatchUpAsync();
+        HomeTracker.Device.HomeWidget.HomeWidget.Refresh();
+        UpdateService.DeleteDownloads();
+        _ = _photos.CleanUpAsync();
+        ScanService.ClearPickerCopies();
 
         if (await _updates.CheckIfDueAsync() is { } update)
         {

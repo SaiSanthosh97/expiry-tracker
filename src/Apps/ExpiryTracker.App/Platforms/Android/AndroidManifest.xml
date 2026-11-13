@@ -7,6 +7,10 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
 
+	<!-- In-app updates: lets Android's installer install a new version downloaded from this app's GitHub releases.
+	     Android asks the user to allow it once ("Install unknown apps"). -->
+	<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
 	<!-- Expiry reminders. -->
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<!-- Restore the daily reminder after the phone restarts. -->

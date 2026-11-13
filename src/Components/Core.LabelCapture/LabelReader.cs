@@ -5,6 +5,11 @@ namespace HomeTracker.Core.LabelCapture;
 /// <param name="RawText">Everything that was read, for troubleshooting and for other parsers (e.g. FSSAI licence numbers).</param>
 public sealed record LabelReading(LabelDateResult Dates, string RawText);
 
+/// <summary>Everything read from one photo of a pack.</summary>
+/// <param name="Barcode">A valid retail product code, or null.</param>
+/// <param name="NameGuess">The most prominent words on the pack, usually the brand or product name; may be wrong.</param>
+public sealed record PackReading(string? Barcode, string? NameGuess, LabelDateResult Dates, string RawText);
+
 /// <summary>
 /// Turns photos of a pack into data: the product barcode, and the expiry information printed on it.
 /// Platform-independent; the actual image reading is done by the injected readers.
@@ -13,8 +18,16 @@ public sealed class LabelReader(IBarcodeReader barcodes, ITextReader text, Label
 {
     public async Task<LabelReading> ReadDatesAsync(string imagePath, CancellationToken cancellationToken = default)
     {
-        var raw = await text.ReadAsync(imagePath, cancellationToken);
-        return new LabelReading(extractor.Extract(raw), raw);
+        var reading = await text.ReadAsync(imagePath, cancellationToken);
+        return new LabelReading(extractor.Extract(reading.Text), reading.Text);
+    }
+
+    /// <summary>Reads the barcode, the product name and any printed dates from one photo.</summary>
+    public async Task<PackReading> ReadPackAsync(string imagePath, CancellationToken cancellationToken = default)
+    {
+        var barcode = await ReadProductBarcodeAsync(imagePath, cancellationToken);
+        var reading = await text.ReadAsync(imagePath, cancellationToken);
+        return new PackReading(barcode, ProductNameGuesser.Guess(reading.Lines), extractor.Extract(reading.Text), reading.Text);
     }
 
     /// <returns>The first valid retail product code in the photo, or null.</returns>

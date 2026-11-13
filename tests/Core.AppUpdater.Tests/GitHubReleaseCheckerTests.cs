@@ -47,6 +47,29 @@ public class GitHubReleaseCheckerTests
     }
 
     [Fact]
+    public void Reads_the_published_checksum_and_size()
+    {
+        var json = JsonDocument.Parse($$"""
+            {
+              "tag_name": "v0.3.0",
+              "assets": [ { "name": "home-tracker.apk", "browser_download_url": "{{GoodUrl}}", "size": 1234,
+                            "digest": "sha256:D660256F6B67C95190BAEA8937E952E91FB022710CED072FCC087AA3E5F97272" } ]
+            }
+            """).RootElement;
+
+        var update = Checker.Parse(json, new Version(0, 2));
+
+        Assert.Equal("d660256f6b67c95190baea8937e952e91fb022710ced072fcc087aa3e5f97272", update?.Sha256);
+        Assert.Equal(1234, update?.Size);
+    }
+
+    [Fact]
+    public void Missing_or_malformed_checksum_is_null()
+    {
+        Assert.Null(Checker.Parse(Release("v0.3.0", "home-tracker.apk", GoodUrl), new Version(0, 2))?.Sha256);
+    }
+
+    [Fact]
     public void Same_or_older_release_is_ignored()
     {
         Assert.Null(Checker.Parse(Release("v0.2.0", "home-tracker.apk", GoodUrl), new Version(0, 2, 0)));

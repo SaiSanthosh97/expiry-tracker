@@ -10,6 +10,7 @@
     <Project Path="src/Components/Core.LabelCapture/Core.LabelCapture.csproj" />
     <Project Path="src/Components/Core.ProductCatalog/Core.ProductCatalog.csproj" />
     <Project Path="src/Components/Core.ShelfLife/Core.ShelfLife.csproj" />
+    <Project Path="src/Components/Device.HomeWidget/Device.HomeWidget.csproj" />
     <Project Path="src/Components/Device.Reminders/Device.Reminders.csproj" />
     <Project Path="src/Components/Device.Vision/Device.Vision.csproj" />
     <Project Path="src/Components/Storage.Sqlite/Storage.Sqlite.csproj" />

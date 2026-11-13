@@ -1,25 +1,49 @@
 namespace ExpiryTracker.App.Services;
 
-/// <summary>Remembers the last "Used up / Thrown away" so the home screen can offer Undo for a few seconds.</summary>
+/// <summary>
+/// Remembers the last "Used up / Thrown away" so the home screen can offer Undo. Kept in the app's settings,
+/// so an action from the widget can still be undone when the app is opened a little later.
+/// </summary>
 public sealed class UndoService
 {
+    /// <summary>How long Undo stays on screen once shown, and how long an action in the app can be undone.</summary>
     public static readonly TimeSpan Window = TimeSpan.FromSeconds(10);
 
-    private (string ItemId, string Message, DateTime At)? _pending;
+    /// <summary>How long an action taken on the home-screen widget can be undone from the app.</summary>
+    public static readonly TimeSpan WidgetWindow = TimeSpan.FromMinutes(5);
 
-    public void Offer(string itemId, string message) => _pending = (itemId, message, DateTime.UtcNow);
+    private const string IdKey = "undo.itemId";
+    private const string MessageKey = "undo.message";
+    private const string UntilKey = "undo.untilUtcTicks";
 
-    /// <returns>The pending undo, if it is still within the time window.</returns>
+    public void Offer(string itemId, string message) => Offer(itemId, message, Window);
+
+    public void Offer(string itemId, string message, TimeSpan window)
+    {
+        Preferences.Default.Set(IdKey, itemId);
+        Preferences.Default.Set(MessageKey, message);
+        Preferences.Default.Set(UntilKey, (DateTime.UtcNow + window).Ticks);
+    }
+
+    /// <returns>The pending undo, if it is still within its time window.</returns>
     public (string ItemId, string Message)? Take()
     {
-        if (_pending is { } p && DateTime.UtcNow - p.At < Window)
+        var id = Preferences.Default.Get<string?>(IdKey, null);
+        var message = Preferences.Default.Get<string?>(MessageKey, null);
+        var until = Preferences.Default.Get(UntilKey, 0L);
+        if (id is not null && message is not null && DateTime.UtcNow.Ticks < until)
         {
-            return (p.ItemId, p.Message);
+            return (id, message);
         }
 
-        _pending = null;
+        Clear();
         return null;
     }
 
-    public void Clear() => _pending = null;
+    public void Clear()
+    {
+        Preferences.Default.Remove(IdKey);
+        Preferences.Default.Remove(MessageKey);
+        Preferences.Default.Remove(UntilKey);
+    }
 }

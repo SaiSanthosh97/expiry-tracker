@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.UpdatePage"
+             Title="{x:Static s:AppResources.Update_Title}">
+
+    <VerticalStackLayout Padding="24,48" Spacing="18" VerticalOptions="Center">
+        <Label Text="{x:Static s:AppResources.Update_Title}" Style="{StaticResource Heading}" FontSize="26" HorizontalTextAlignment="Center" />
+        <Label x:Name="StatusLabel" FontSize="20" HorizontalTextAlignment="Center" />
+        <ProgressBar x:Name="Progress" ProgressColor="{StaticResource Primary}" HeightRequest="12" />
+        <Label x:Name="PercentLabel" Style="{StaticResource Subtle}" HorizontalTextAlignment="Center" />
+
+        <Button x:Name="AllowButton" Text="{x:Static s:AppResources.Update_AllowButton}" Clicked="OnAllowClicked"
+                FontSize="22" HeightRequest="68" IsVisible="False" />
+        <Button x:Name="InstallButton" Text="{x:Static s:AppResources.Update_InstallButton}" Clicked="OnInstallClicked"
+                FontSize="22" HeightRequest="68" IsVisible="False" />
+        <Button x:Name="CancelButton" Text="{x:Static s:AppResources.Update_Cancel}" Clicked="OnCancelClicked"
+                Style="{StaticResource OutlineButton}" />
+    </VerticalStackLayout>
+</ContentPage>

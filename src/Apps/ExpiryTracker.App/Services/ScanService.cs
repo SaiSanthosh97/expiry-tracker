@@ -46,6 +46,9 @@ public sealed class ScanService(LabelReader reader, ProductLookup lookup, Dialog
             await source.CopyToAsync(target);
         }
 
+        // The picker leaves its own full-size copy in our cache; don't keep it.
+        ClearPickerCopies(except: path);
+
         return path;
     }
 
@@ -53,9 +56,37 @@ public sealed class ScanService(LabelReader reader, ProductLookup lookup, Dialog
 
     public Task<LabelReading> ReadDatesAsync(string photoPath) => reader.ReadDatesAsync(photoPath);
 
+    public Task<PackReading> ReadPackAsync(string photoPath) => reader.ReadPackAsync(photoPath);
+
     public Task<ProductLookupResult> LookupAsync(string barcode) => lookup.FindAsync(barcode);
 
-    /// <summary>Photos are only needed while reading; nothing is kept.</summary>
+    private static readonly string[] ImageExtensions = [".jpg", ".jpeg", ".png", ".heic", ".heif", ".webp"];
+
+    /// <summary>
+    /// Deletes full-size photos the photo picker or camera left in the app's cache. The image loader's own
+    /// small thumbnail cache is left alone.
+    /// </summary>
+    public static void ClearPickerCopies(string? except = null)
+    {
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(FileSystem.CacheDirectory, "*", SearchOption.AllDirectories))
+            {
+                if (file != except
+                    && !file.Contains("image_manager_disk_cache", StringComparison.Ordinal)
+                    && ImageExtensions.Contains(Path.GetExtension(file).ToLowerInvariant()))
+                {
+                    Discard(file);
+                }
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Tried again next time.
+        }
+    }
+
+    /// <summary>Deletes the full-size copy once it has been read (a small copy is kept by <see cref="PhotoStore"/>).</summary>
     public static void Discard(string photoPath)
     {
         try

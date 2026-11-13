@@ -10,6 +10,14 @@
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
 
+            <!-- Photo of the product, so it's easy to recognise -->
+            <Border IsVisible="{Binding HasPhoto}" StrokeThickness="0" StrokeShape="RoundRectangle 14" HeightRequest="240" BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ViewPhotoCommand}" />
+                </Border.GestureRecognizers>
+                <Image Source="{Binding Photo}" Aspect="AspectFit" />
+            </Border>
+
             <!-- Big status banner -->
             <Border BackgroundColor="{Binding StatusColor}" StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="18,16">
                 <VerticalStackLayout Spacing="4">
