@@ -131,7 +131,7 @@ public sealed partial class FamilyViewModel(HomeService homes, FamilySyncService
         IsBusy = true;
         try
         {
-            await sync.SyncNowAsync();
+            await sync.RefreshAsync();
         }
         finally
         {

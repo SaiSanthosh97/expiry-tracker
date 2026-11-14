@@ -18,6 +18,10 @@
                 <Image Source="{Binding Photo}" Aspect="AspectFit" />
             </Border>
 
+            <Border IsVisible="{Binding HasPhotoComing}" Style="{StaticResource Card}" Padding="14">
+                <Label Text="{Binding PhotoComing}" Style="{StaticResource Subtle}" />
+            </Border>
+
             <!-- Big status banner -->
             <Border BackgroundColor="{Binding StatusColor}" StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="18,16">
                 <VerticalStackLayout Spacing="4">

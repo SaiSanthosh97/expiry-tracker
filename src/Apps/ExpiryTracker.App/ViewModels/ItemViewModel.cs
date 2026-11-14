@@ -48,6 +48,13 @@ public sealed partial class ItemViewModel(ItemService items, UndoService undo, D
 
     public bool HasPhoto => Photo is not null;
 
+    /// <summary>Set when the item has a photo on another family phone that hasn't arrived here yet.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPhotoComing))]
+    public partial string? PhotoComing { get; set; }
+
+    public bool HasPhotoComing => PhotoComing is not null;
+
     public ObservableCollection<DetailRow> Details { get; } = [];
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -69,6 +76,9 @@ public sealed partial class ItemViewModel(ItemService items, UndoService undo, D
         var item = evaluation.Item;
         Name = item.Name;
         Photo = PhotoStore.ImageOf(item.PhotoPath);
+        PhotoComing = item.PhotoPath is not null && Photo is null
+            ? string.IsNullOrEmpty(item.AddedBy) ? AppResources.Item_PhotoComing : string.Format(AppResources.Item_PhotoComingFrom, item.AddedBy)
+            : null;
         Category = Text.Category(item.CategoryId);
         StatusText = Text.Status(evaluation);
         StatusColor = Text.StatusColor(evaluation.Status.State);

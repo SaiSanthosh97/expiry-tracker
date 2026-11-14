@@ -23,7 +23,7 @@ public sealed class FamilySyncService
     private const string PhotoKind = "photo";
     private const string PhotoRequestKind = "photo-request";
     private static readonly TimeSpan PhotoAskAgainAfter = TimeSpan.FromHours(6);
-    private static readonly TimeSpan PhotoResendAtMostEvery = TimeSpan.FromHours(1);
+    private static readonly TimeSpan PhotoResendAtMostEvery = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan StateAskAgainAfter = TimeSpan.FromMinutes(30);
 
     private const string OutboxKey = "sync.outbox";
@@ -96,6 +96,22 @@ public sealed class FamilySyncService
             }
             while (await timer.WaitForNextTickAsync(cts.Token).AsTaskSafe());
         });
+    }
+
+    private bool _askPhotosNow;
+
+    /// <summary>"Refresh": sync now, and ask for any missing photos straight away.</summary>
+    public async Task RefreshAsync()
+    {
+        _askPhotosNow = true;
+        try
+        {
+            await SyncNowAsync();
+        }
+        finally
+        {
+            _askPhotosNow = false;
+        }
     }
 
     /// <summary>Sends pending changes and fetches new ones for every shared home. Never throws.</summary>
@@ -273,6 +289,14 @@ public sealed class FamilySyncService
             .ToList();
         await PublishItemsAsync(home, items, cancellationToken);
         SetTime("sync.statereply." + home.Id, _clock.Now);
+
+        // Photos of open items go with the list, so a phone that just joined doesn't have to ask for each.
+        var photos = items
+            .Where(i => !i.IsClosed && !i.IsDeleted && PhotoStore.Exists(i.PhotoPath))
+            .OrderByDescending(i => i.UpdatedAt)
+            .Select(i => i.PhotoPath!)
+            .Take(40);
+        await SendRequestedPhotosAsync(home, photos, cancellationToken);
     }
 
     private async Task PublishItemsAsync(Home home, IReadOnlyList<TrackedItem> items, CancellationToken cancellationToken)
@@ -330,7 +354,7 @@ public sealed class FamilySyncService
         var missing = (await _items.GetEverythingAsync(home.Id))
             .Where(i => !i.IsDeleted && !i.IsClosed && PhotoStore.IsValidName(i.PhotoPath) && !PhotoStore.Exists(i.PhotoPath))
             .Select(i => i.PhotoPath!)
-            .Where(f => GetTime("sync.photoask." + f) is not { } asked || now - asked > PhotoAskAgainAfter)
+            .Where(f => _askPhotosNow || GetTime("sync.photoask." + f) is not { } asked || now - asked > PhotoAskAgainAfter)
             .Take(20)
             .ToList();
         if (missing.Count == 0)

@@ -145,7 +145,7 @@ public sealed partial class HomeViewModel : ObservableObject
             details = homeName + " · " + details;
         }
 
-        if (!string.IsNullOrEmpty(e.Item.AddedBy) && e.Item.AddedBy != _myName)
+        if (!string.IsNullOrEmpty(e.Item.AddedBy))
         {
             details += " · " + string.Format(AppResources.Item_By, e.Item.AddedBy);
         }
@@ -236,7 +236,7 @@ public sealed partial class HomeViewModel : ObservableObject
         IsRefreshing = true;
         try
         {
-            await _sync.SyncNowAsync();
+            await _sync.RefreshAsync();
             await LoadAsync();
         }
         finally

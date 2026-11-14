@@ -238,4 +238,6 @@ Only share this with family: anyone with it can see and change the list.</value>
   <data name="Move_Text" xml:space="preserve"><value>Easiest: set up the new phone with the same Google account (or use Samsung Smart Switch). Use It Before then comes back with your homes, lists and photos – install the app from the same link and open it.
 
 Also works without backup: on the new phone, Homes → Join a home, and take a photo of a home&apos;s QR code on another phone (open the home here to see it). The list and photos arrive within a few minutes.</value></data>
+  <data name="Item_PhotoComing" xml:space="preserve"><value>📷 The photo is on its way from the family phone that took it. Tap Refresh on the main screen to ask for it now.</value></data>
+  <data name="Item_PhotoComingFrom" xml:space="preserve"><value>📷 The photo is on its way from {0}&apos;s phone. It arrives when that phone is online – tap Refresh on the main screen to ask for it now.</value></data>
 </root>

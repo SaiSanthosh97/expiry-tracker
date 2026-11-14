@@ -46,7 +46,7 @@ public sealed partial class HomesViewModel(
     }
 
     [RelayCommand]
-    private Task OpenAsync(HomeRow row) => Shell.Current.GoToAsync($"home?id={row.Id}");
+    private Task OpenAsync(HomeRow row) => Shell.Current.GoToAsync($"homedetails?id={row.Id}");
 
     [RelayCommand]
     private async Task NewHomeAsync()
@@ -59,7 +59,7 @@ public sealed partial class HomesViewModel(
 
         var home = await homes.CreateAsync(name);
         await LoadAsync();
-        await Shell.Current.GoToAsync($"home?id={home.Id}");
+        await Shell.Current.GoToAsync($"homedetails?id={home.Id}");
     }
 
     [RelayCommand]
