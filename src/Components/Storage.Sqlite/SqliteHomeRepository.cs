@@ -54,6 +54,12 @@ public sealed class SqliteHomeRepository : IHomeRepository, IAsyncDisposable
         await _connection.InsertOrReplaceAsync(DeviceRow.From(device));
     }
 
+    public async Task DeleteDeviceAsync(string homeId, string deviceId)
+    {
+        await _initialized.Value;
+        await _connection.DeleteAsync<DeviceRow>(homeId + "/" + deviceId);
+    }
+
     public ValueTask DisposeAsync() => new(_connection.CloseAsync());
 
     [Table("Homes")]

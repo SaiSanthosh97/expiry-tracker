@@ -11,6 +11,8 @@ public sealed class HomeService(IHomeRepository repository, ItemService items, C
 {
     private const string CurrentKey = "home.current";
     private const string DeviceIdKey = "device.id";
+    private const string LastDeviceIdKey = "device.last-id";
+    private const string ReplacesKey = "device.replaces";
     private const string DeviceNameKey = "device.name";
     private const string RemindKeyPrefix = "home.remind.";
 
@@ -19,20 +21,53 @@ public sealed class HomeService(IHomeRepository repository, ItemService items, C
     /// <summary>Raised when homes are added, removed, renamed or switched.</summary>
     public event EventHandler? Changed;
 
-    public DeviceIdentity Me
+    private static string? _deviceId;
+
+    public DeviceIdentity Me => new(DeviceId(), Preferences.Default.Get(DeviceNameKey, DefaultDeviceName()));
+
+    /// <summary>
+    /// This phone's id lives in Android's "no backup" folder: a new phone restored from a backup must not
+    /// pretend to be the old one (each phone ignores its own messages).
+    /// </summary>
+    private static string DeviceId()
     {
-        get
+        if (_deviceId is not null)
         {
-            var id = Preferences.Default.Get<string?>(DeviceIdKey, null);
+            return _deviceId;
+        }
+
+        var file = Path.Combine(Android.App.Application.Context.NoBackupFilesDir!.AbsolutePath, "device-id");
+        var id = File.Exists(file) ? File.ReadAllText(file).Trim() : null;
+        if (string.IsNullOrEmpty(id))
+        {
+            // 0.4.x kept the id in settings (never backed up then); keep it so this phone stays the same phone.
+            id = Preferences.Default.Get<string?>(DeviceIdKey, null);
             if (id is null)
             {
                 id = DeviceIdentity.NewId();
-                Preferences.Default.Set(DeviceIdKey, id);
+                // Settings restored from a backup still name the old phone: this phone replaces it.
+                if (Preferences.Default.Get<string?>(LastDeviceIdKey, null) is { } previous && previous != id)
+                {
+                    Preferences.Default.Set(ReplacesKey, previous);
+                }
             }
 
-            return new DeviceIdentity(id, Preferences.Default.Get(DeviceNameKey, DefaultDeviceName()));
+            File.WriteAllText(file, id);
         }
+
+        Preferences.Default.Remove(DeviceIdKey);
+        // Backed up with the other settings, so a restored phone knows which phone it replaces.
+        Preferences.Default.Set(LastDeviceIdKey, id);
+        return _deviceId = id;
     }
+
+    /// <summary>The phone this one replaced when it was restored from a backup, until the family has been told.</summary>
+    public static string? ReplacesDeviceId => Preferences.Default.Get<string?>(ReplacesKey, null);
+
+    public static void ReplacementAnnounced() => Preferences.Default.Remove(ReplacesKey);
+
+    /// <summary>Forgets a family phone (e.g. one that was replaced by a new phone).</summary>
+    public Task ForgetDeviceAsync(string homeId, string deviceId) => repository.DeleteDeviceAsync(homeId, deviceId);
 
     public void SetDeviceName(string name)
     {

@@ -72,6 +72,9 @@
                 <Label Text="{x:Static s:AppResources.Family_JoinHelp}" />
                 <Button Text="{x:Static s:AppResources.Family_JoinTitle}" Command="{Binding JoinCommand}" Style="{StaticResource OutlineButton}" />
 
+                <!-- New phone -->
+                <Button Text="{x:Static s:AppResources.Move_Button}" Command="{Binding MoveToNewPhoneCommand}" Style="{StaticResource OutlineButton}" Margin="0,8,0,0" />
+
                 <!-- This phone -->
                 <Label Text="{x:Static s:AppResources.Family_PhoneName}" Style="{StaticResource SectionLabel}" FontSize="22" />
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">

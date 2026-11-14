@@ -1,7 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-	<!-- allowBackup is off: the list stays on this phone unless the user exports it. -->
-	<application android:allowBackup="false" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"></application>
+	<!-- Android backup to the user's own Google account (and Samsung Smart Switch / phone-to-phone transfer), so a new
+	     phone gets the list back. Only when Google can encrypt it with the screen lock; see Resources/xml. -->
+	<application android:allowBackup="true" android:fullBackupContent="@xml/backup_rules" android:dataExtractionRules="@xml/data_extraction_rules" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"></application>
 
 	<!-- Update checks against GitHub Releases, and only on Wi-Fi. -->
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

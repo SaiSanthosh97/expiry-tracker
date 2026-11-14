@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 6–11: what Android backup (Google account) includes. The list database, photos and settings.
+     This phone's own id is kept in the "no backup" folder, which is never included. -->
+<full-backup-content>
+    <include domain="file" path="." />
+    <include domain="sharedpref" path="." />
+</full-backup-content>

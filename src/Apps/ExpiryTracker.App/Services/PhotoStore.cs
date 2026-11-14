@@ -5,7 +5,8 @@ namespace ExpiryTracker.App.Services;
 
 /// <summary>
 /// Item photos, kept in the app's private storage (not in the phone's gallery). Items store only the file
-/// name, so the folder can move. Each photo is shrunk to about 150 KB.
+/// name, so the folder can move. Each photo is shrunk to about 100 KB. Photos are shared with family
+/// phones through family sync and included in the phone's Android backup.
 /// </summary>
 public sealed class PhotoStore(IItemRepository repository)
 {
@@ -23,6 +24,30 @@ public sealed class PhotoStore(IItemRepository repository)
         return File.Exists(path) ? path : null;
     }
 
+    /// <summary>Photo file names are always 32 hex characters + ".jpg"; anything else from another phone is refused.</summary>
+    public static bool IsValidName(string? fileName) =>
+        fileName is { Length: 36 } && fileName.EndsWith(".jpg", StringComparison.Ordinal)
+        && fileName[..32].All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f');
+
+    public static bool Exists(string? fileName) => PathOf(fileName) is not null;
+
+    public static byte[]? ReadBytes(string fileName) => PathOf(fileName) is { } path ? File.ReadAllBytes(path) : null;
+
+    /// <summary>Saves a photo received from a family phone under its original name.</summary>
+    public static async Task SaveReceivedAsync(string fileName, byte[] bytes)
+    {
+        if (!IsValidName(fileName))
+        {
+            return;
+        }
+
+        Directory.CreateDirectory(Folder);
+        var target = Path.Combine(Folder, fileName);
+        var temp = target + ".part";
+        await File.WriteAllBytesAsync(temp, bytes);
+        File.Move(temp, target, overwrite: true);
+    }
+
     public static ImageSource? ImageOf(string? fileName) => PathOf(fileName) is { } path ? ImageSource.FromFile(path) : null;
 
     /// <summary>Saves a smaller copy of a photo.</summary>
@@ -31,7 +56,8 @@ public sealed class PhotoStore(IItemRepository repository)
     {
         Directory.CreateDirectory(Folder);
         var name = $"{Guid.NewGuid():N}.jpg";
-        return PhotoShrinker.SaveAsJpeg(sourcePath, Path.Combine(Folder, name)) ? name : null;
+        // About 80–120 KB each, so hundreds fit in Android's 25 MB app backup.
+        return PhotoShrinker.SaveAsJpeg(sourcePath, Path.Combine(Folder, name), maxSide: 1024, quality: 75) ? name : null;
     });
 
     public static void Delete(string? fileName)

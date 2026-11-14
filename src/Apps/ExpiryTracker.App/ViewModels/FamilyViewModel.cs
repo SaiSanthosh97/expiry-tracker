@@ -214,6 +214,28 @@ public sealed partial class FamilyViewModel(
         return null;
     }
 
+    /// <summary>Explains the two ways to move to a new phone, and offers to share the list if it isn't yet.</summary>
+    [RelayCommand]
+    private async Task MoveToNewPhoneAsync()
+    {
+        if (_home is null)
+        {
+            return;
+        }
+
+        if (_home.IsShared)
+        {
+            await dialogs.AlertAsync(AppResources.Move_Title, AppResources.Move_TextShared);
+            return;
+        }
+
+        var share = await dialogs.ConfirmAsync(AppResources.Move_Title, AppResources.Move_TextNotShared, AppResources.Move_ShareNow, AppResources.Common_Cancel);
+        if (share)
+        {
+            await ShareAsync();
+        }
+    }
+
     [RelayCommand]
     private async Task SwitchHomeAsync()
     {

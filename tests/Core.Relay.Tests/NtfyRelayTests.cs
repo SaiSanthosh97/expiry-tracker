@@ -56,6 +56,40 @@ public class NtfyRelayTests
     }
 
     [Fact]
+    public async Task Fetch_reads_attachment_links()
+    {
+        var handler = new Recorder(
+            """{"id":"a1","time":1,"event":"message","topic":"t","message":"1.x","attachment":{"name":"data.bin","size":5,"url":"https://ntfy.sh/file/a1.bin"}}""");
+        var relay = new NtfyRelay(new HttpClient(handler), Server, "HomeTracker");
+
+        var message = Assert.Single(await relay.FetchAsync("t", null));
+
+        Assert.Equal(new Uri("https://ntfy.sh/file/a1.bin"), message.AttachmentUrl);
+    }
+
+    [Fact]
+    public async Task Publish_file_sends_bytes_with_the_text_in_a_header()
+    {
+        var handler = new Recorder("""{"id":"f1","time":1,"event":"message"}""");
+        var relay = new NtfyRelay(new HttpClient(handler), Server, "HomeTracker");
+
+        await relay.PublishFileAsync("t", [1, 2, 3], "1.sealed");
+
+        Assert.Equal(HttpMethod.Put, handler.Request!.Method);
+        Assert.Equal("1.sealed", handler.Request.Headers.GetValues("Message").Single());
+        Assert.Equal("no", handler.Request.Headers.GetValues("X-Firebase").Single());
+    }
+
+    [Theory]
+    [InlineData("https://evil.example/file/a.bin")]
+    [InlineData("http://ntfy.sh/file/a.bin")]
+    public async Task Download_only_follows_links_on_the_relay_server(string url)
+    {
+        var relay = new NtfyRelay(new HttpClient(new Recorder("")), Server, "HomeTracker");
+        await Assert.ThrowsAsync<ArgumentException>(() => relay.DownloadAsync(new Uri(url)));
+    }
+
+    [Fact]
     public async Task Fetch_without_a_valid_since_gets_everything_kept()
     {
         var handler = new Recorder("");

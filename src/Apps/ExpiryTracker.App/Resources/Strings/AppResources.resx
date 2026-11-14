@@ -120,7 +120,7 @@
   <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates. Check your internet connection.</value></data>
   <data name="Settings_About" xml:space="preserve"><value>About</value></data>
   <data name="About_Disclaimer" xml:space="preserve"><value>Use It Before only reminds you about dates that you or the pack provide. It does not give medical or food-safety advice. Always follow the label and your doctor or pharmacist.</value></data>
-  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone. A small copy of each product photo is kept inside the app (not in your gallery) and deleted with the item. When a photo shows a barcode, only the barcode number is sent to Open Food Facts to find the product name. If you share a home with family, its list (not photos) goes through the free ntfy.sh relay, encrypted so only your family&apos;s phones can read it. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
+  <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone. A small copy of each product photo is kept inside the app (not in your gallery) and deleted with the item. The list and photos are included in your phone&apos;s Google backup, which Google encrypts with your screen lock. When a photo shows a barcode, only the barcode number is sent to Open Food Facts to find the product name. If you share a home with family, its list and photos go through the free ntfy.sh relay, encrypted so only your family&apos;s phones can read it. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
   <data name="About_License" xml:space="preserve"><value>Free and open source (MIT License).</value></data>
   <data name="About_SourceCode" xml:space="preserve"><value>Source code on GitHub</value></data>
   <data name="Reminder_Channel" xml:space="preserve"><value>Expiry reminders</value></data>
@@ -224,7 +224,16 @@ Only share this with family: anyone with it can see and change the list.</value>
   <data name="Family_LeaveTitle" xml:space="preserve"><value>Leave “{0}”?</value></data>
   <data name="Family_LeaveText" xml:space="preserve"><value>This home and its list are removed from this phone. Other family phones keep the list.</value></data>
   <data name="Family_LeaveButton" xml:space="preserve"><value>Leave this home</value></data>
-  <data name="Family_Privacy" xml:space="preserve"><value>Shared lists go through ntfy.sh, a free public relay, encrypted on this phone with a key only your family has. The relay cannot read them and keeps them for at most 12 hours. Photos are not shared.</value></data>
+  <data name="Family_Privacy" xml:space="preserve"><value>Shared lists go through ntfy.sh, a free public relay, encrypted on this phone with a key only your family has. The relay cannot read them and keeps them for at most 12 hours. Photos are shared the same way and kept there for at most 3 hours.</value></data>
   <data name="Family_SilentTitle" xml:space="preserve"><value>{0} hasn&apos;t checked in</value></data>
   <data name="Family_SilentText" xml:space="preserve"><value>{0} has not been in touch for a day ({1}). Its reminders may be blocked by battery saving, or the phone may be off.</value></data>
+  <data name="Move_Button" xml:space="preserve"><value>Moving to a new phone?</value></data>
+  <data name="Move_Title" xml:space="preserve"><value>Moving to a new phone</value></data>
+  <data name="Move_TextShared" xml:space="preserve"><value>Easiest: set up the new phone with the same Google account (or use Samsung Smart Switch). Use It Before then comes back with your list and photos – install the app from the same link and open it.
+
+Also works without backup: on the new phone, Family → Join a family home, and take a photo of the QR code on this screen. The list and photos arrive within a few minutes.</value></data>
+  <data name="Move_TextNotShared" xml:space="preserve"><value>Easiest: set up the new phone with the same Google account (or use Samsung Smart Switch). Use It Before then comes back with your list and photos – install the app from the same link and open it.
+
+To be sure, you can also share this list now and join it from the new phone with the QR code. Afterwards, “Leave this home” on the old phone.</value></data>
+  <data name="Move_ShareNow" xml:space="preserve"><value>Share now</value></data>
 </root>

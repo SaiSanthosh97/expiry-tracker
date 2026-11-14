@@ -148,6 +148,10 @@ public sealed class SqliteItemRepositoryTests : IAsyncLifetime
         Assert.Equal(now.AddHours(1), device.LastSeen);
         Assert.Equal(now, device.SilentAlertSent);
 
+        await homes.SaveDeviceAsync(new HomeTracker.Core.Households.FamilyDevice(home.Id, "d2", "Old phone", now));
+        await homes.DeleteDeviceAsync(home.Id, "d2");
+        Assert.Equal(["d1"], (await homes.GetDevicesAsync(home.Id)).Select(d => d.DeviceId));
+
         await homes.DeleteHomeAsync(home.Id);
         Assert.Empty(await homes.GetHomesAsync());
         Assert.Empty(await homes.GetDevicesAsync(home.Id));

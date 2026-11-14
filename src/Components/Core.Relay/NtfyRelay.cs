@@ -6,7 +6,8 @@ using System.Text.RegularExpressions;
 namespace HomeTracker.Core.Relay;
 
 /// <param name="Id">The relay's message id; pass the last one seen as <c>since</c> to get only newer messages.</param>
-public sealed record RelayMessage(string Id, DateTimeOffset Time, string Text);
+/// <param name="AttachmentUrl">Link to a file sent with the message (ntfy.sh keeps files for 3 hours), or null.</param>
+public sealed record RelayMessage(string Id, DateTimeOffset Time, string Text, Uri? AttachmentUrl = null);
 
 /// <summary>
 /// Sends and fetches short text messages through an ntfy server (the free public ntfy.sh or a self-hosted one).
@@ -17,6 +18,9 @@ public sealed partial class NtfyRelay(HttpClient http, Uri server, string userAg
 {
     /// <summary>ntfy.sh turns larger messages into attachments; stay below this.</summary>
     public const int MaxMessageLength = 3800;
+
+    /// <summary>ntfy.sh accepts files up to 2 MB for visitors without an account.</summary>
+    public const int MaxFileSize = 2 * 1024 * 1024;
 
     /// <exception cref="HttpRequestException">No connection, or the server refused (e.g. daily limit reached).</exception>
     public async Task<string> PublishAsync(string topic, string text, CancellationToken cancellationToken = default)
@@ -39,6 +43,60 @@ public sealed partial class NtfyRelay(HttpClient http, Uri server, string userAg
         response.EnsureSuccessStatusCode();
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
         return json.RootElement.GetProperty("id").GetString() ?? "";
+    }
+
+    /// <summary>Sends a file (at most <see cref="MaxFileSize"/>) together with a short text message.</summary>
+    /// <exception cref="HttpRequestException">No connection, or the server refused.</exception>
+    public async Task<string> PublishFileAsync(string topic, byte[] file, string text, CancellationToken cancellationToken = default)
+    {
+        CheckTopic(topic);
+        if (file.Length > MaxFileSize)
+        {
+            throw new ArgumentException($"Files must be at most {MaxFileSize} bytes.", nameof(file));
+        }
+
+        if (text.Length > MaxMessageLength)
+        {
+            throw new ArgumentException($"Messages must be at most {MaxMessageLength} characters.", nameof(text));
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Put, TopicUrl(topic))
+        {
+            Content = new ByteArrayContent(file),
+        };
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+        AddHeaders(request);
+        request.Headers.Add("X-Firebase", "no");
+        request.Headers.Add("Filename", "data.bin");
+        // The text travels in a header next to the file; sealed text is plain ASCII.
+        request.Headers.Add("Message", text);
+
+        using var response = await http.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+        return json.RootElement.GetProperty("id").GetString() ?? "";
+    }
+
+    /// <summary>Downloads a file sent with a message. Only links on this relay's own server are followed.</summary>
+    /// <exception cref="HttpRequestException">No connection, or the file has expired.</exception>
+    public async Task<byte[]> DownloadAsync(Uri attachmentUrl, CancellationToken cancellationToken = default)
+    {
+        if (attachmentUrl.Scheme != Uri.UriSchemeHttps || !string.Equals(attachmentUrl.Host, server.Host, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("Files are only downloaded from the relay's own server.", nameof(attachmentUrl));
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, attachmentUrl);
+        AddHeaders(request);
+        using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        if (response.Content.Headers.ContentLength > MaxFileSize)
+        {
+            throw new HttpRequestException("The file is larger than allowed.");
+        }
+
+        var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        return bytes.Length <= MaxFileSize ? bytes : throw new HttpRequestException("The file is larger than allowed.");
     }
 
     /// <param name="since">The id of the last message already seen, or null for everything the server still keeps (ntfy.sh: 12 hours).</param>
@@ -71,7 +129,14 @@ public sealed partial class NtfyRelay(HttpClient http, Uri server, string userAg
                     var time = root.TryGetProperty("time", out var t) && t.TryGetInt64(out var seconds)
                         ? DateTimeOffset.FromUnixTimeSeconds(seconds)
                         : DateTimeOffset.MinValue;
-                    messages.Add(new RelayMessage(id.GetString() ?? "", time, message.GetString() ?? ""));
+                    Uri? attachment = null;
+                    if (root.TryGetProperty("attachment", out var file) && file.TryGetProperty("url", out var url)
+                        && Uri.TryCreate(url.GetString(), UriKind.Absolute, out var parsed))
+                    {
+                        attachment = parsed;
+                    }
+
+                    messages.Add(new RelayMessage(id.GetString() ?? "", time, message.GetString() ?? "", attachment));
                 }
             }
             catch (JsonException)

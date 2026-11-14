@@ -36,6 +36,16 @@ public class SyncTests
     }
 
     [Fact]
+    public void Sealed_bytes_round_trip_and_reject_other_labels()
+    {
+        var photo = RandomNumberGenerator.GetBytes(5000);
+        var sealedBytes = SealedBox.SealBytes(Key, photo, "home-1/photo.jpg");
+
+        Assert.Equal(photo, SealedBox.OpenBytes(Key, sealedBytes, "home-1/photo.jpg"));
+        Assert.Null(SealedBox.OpenBytes(Key, sealedBytes, "home-1/other.jpg"));
+    }
+
+    [Fact]
     public void Same_message_encrypts_differently_each_time()
     {
         Assert.NotEqual(SealedBox.Seal(Key, [1], "h"), SealedBox.Seal(Key, [1], "h"));

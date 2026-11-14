@@ -13,7 +13,11 @@ public static class SealedBox
     private const int NonceSize = 12;
     private const int TagSize = 16;
 
-    public static string Seal(byte[] key, byte[] plaintext, string label)
+    public static string Seal(byte[] key, byte[] plaintext, string label) =>
+        Version + Convert.ToBase64String(SealBytes(key, plaintext, label));
+
+    /// <summary>Like <see cref="Seal"/> but returns raw bytes, for files (e.g. photos).</summary>
+    public static byte[] SealBytes(byte[] key, byte[] plaintext, string label)
     {
         CheckKey(key);
         var nonce = RandomNumberGenerator.GetBytes(NonceSize);
@@ -28,7 +32,7 @@ public static class SealedBox
             output.AsSpan(NonceSize + plaintext.Length, TagSize),
             Encoding.UTF8.GetBytes(label));
 
-        return Version + Convert.ToBase64String(output);
+        return output;
     }
 
     /// <returns>The plaintext, or null when the text wasn't sealed with this key and label (or was altered).</returns>
@@ -50,6 +54,13 @@ public static class SealedBox
             return null;
         }
 
+        return OpenBytes(key, data, label);
+    }
+
+    /// <returns>The plaintext of <see cref="SealBytes"/> output, or null when it doesn't match the key and label.</returns>
+    public static byte[]? OpenBytes(byte[] key, byte[] data, string label)
+    {
+        CheckKey(key);
         if (data.Length < NonceSize + TagSize)
         {
             return null;

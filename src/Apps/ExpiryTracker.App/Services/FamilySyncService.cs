@@ -20,6 +20,11 @@ public sealed class FamilySyncService
     private const string ItemsKind = "items";
     private const string StateRequestKind = "state-request";
     private const string CheckInKind = "check-in";
+    private const string PhotoKind = "photo";
+    private const string PhotoRequestKind = "photo-request";
+    private static readonly TimeSpan PhotoAskAgainAfter = TimeSpan.FromHours(6);
+    private static readonly TimeSpan PhotoResendAtMostEvery = TimeSpan.FromHours(1);
+    private static readonly TimeSpan StateAskAgainAfter = TimeSpan.FromMinutes(30);
 
     private const string OutboxKey = "sync.outbox";
     private static readonly TimeSpan CheckInEvery = TimeSpan.FromHours(6);
@@ -53,6 +58,13 @@ public sealed class FamilySyncService
     private sealed record ItemsBody(List<TrackedItem> Items);
 
     private sealed record EmptyBody;
+
+    /// <param name="Replaces">Set by a phone restored from a backup: the old phone it takes over from.</param>
+    private sealed record CheckInBody(string? Replaces);
+
+    private sealed record PhotoBody(string File);
+
+    private sealed record PhotoRequestBody(List<string> Files);
 
     /// <summary>When this phone last reached the relay for a home, or null.</summary>
     public static DateTimeOffset? LastSync(string homeId) => GetTime("sync.last." + homeId);
@@ -96,10 +108,17 @@ public sealed class FamilySyncService
 
         try
         {
+            var replacing = HomeService.ReplacesDeviceId is not null;
+            var allOk = true;
             foreach (var home in (await _homes.GetHomesAsync()).Where(h => h.IsShared))
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await SyncHomeAsync(home, cancellationToken);
+                allOk &= await SyncHomeAsync(home, cancellationToken);
+            }
+
+            if (replacing && allOk)
+            {
+                HomeService.ReplacementAnnounced();
             }
         }
         catch (OperationCanceledException)
@@ -116,12 +135,15 @@ public sealed class FamilySyncService
     public async Task AfterJoinAsync(Home home)
     {
         Preferences.Default.Remove("sync.since." + home.Id);
+        // Keep asking (every 30 minutes) until another phone has sent the list, in case they were all off.
+        Preferences.Default.Set("sync.awaiting." + home.Id, true);
         await TryAsync(async () =>
         {
             var relay = Relay(home);
-            await relay.PublishAsync(home.Topic!, Encode(home, CheckInKind, new EmptyBody()));
+            await relay.PublishAsync(home.Topic!, Encode(home, CheckInKind, new CheckInBody(null)));
             await relay.PublishAsync(home.Topic!, Encode(home, StateRequestKind, new EmptyBody()));
             SetTime("sync.checkin." + home.Id, _clock.Now);
+            SetTime("sync.statereq." + home.Id, _clock.Now);
         });
         await UpdateBackgroundAsync();
         await SyncNowAsync();
@@ -134,7 +156,8 @@ public sealed class FamilySyncService
         await UpdateBackgroundAsync();
     }
 
-    private async Task SyncHomeAsync(Home home, CancellationToken cancellationToken)
+    /// <returns>False when the relay couldn't be reached.</returns>
+    private async Task<bool> SyncHomeAsync(Home home, CancellationToken cancellationToken)
     {
         var ok = await TryAsync(async () =>
         {
@@ -152,6 +175,8 @@ public sealed class FamilySyncService
         {
             await AlertSilentPhonesAsync(home);
         }
+
+        return ok;
     }
 
     private async Task<bool> FetchAsync(Home home, CancellationToken cancellationToken)
@@ -159,10 +184,15 @@ public sealed class FamilySyncService
         var sinceKey = "sync.since." + home.Id;
         var since = Preferences.Default.Get<string?>(sinceKey, null);
 
-        // Away longer than the relay keeps messages: ask the family to send the whole list again.
-        if (LastSync(home.Id) is { } last && _clock.Now - last > RelayKeeps)
+        // Away longer than the relay keeps messages, or just joined and nothing received yet:
+        // ask the family to send the whole list (again).
+        var awaiting = Preferences.Default.Get("sync.awaiting." + home.Id, false);
+        var away = LastSync(home.Id) is { } last && _clock.Now - last > RelayKeeps;
+        var askedRecently = GetTime("sync.statereq." + home.Id) is { } asked && _clock.Now - asked < StateAskAgainAfter;
+        if (away || (awaiting && !askedRecently))
         {
             await Relay(home).PublishAsync(home.Topic!, Encode(home, StateRequestKind, new EmptyBody()), cancellationToken);
+            SetTime("sync.statereq." + home.Id, _clock.Now);
         }
 
         var messages = await Relay(home).FetchAsync(home.Topic!, since, cancellationToken);
@@ -170,6 +200,8 @@ public sealed class FamilySyncService
         var changed = false;
         var stateRequested = false;
         var incoming = new List<TrackedItem>();
+        var photosRequested = new HashSet<string>();
+        var photoLinks = new Dictionary<string, Uri>();
 
         foreach (var message in messages)
         {
@@ -189,13 +221,27 @@ public sealed class FamilySyncService
                 case StateRequestKind:
                     stateRequested = true;
                     break;
+                case CheckInKind when envelope.BodyAs<CheckInBody>() is { Replaces: { } old } && old != me:
+                    await _homes.ForgetDeviceAsync(home.Id, old);
+                    break;
+                case PhotoKind when envelope.BodyAs<PhotoBody>() is { } photo && message.AttachmentUrl is { } url && PhotoStore.IsValidName(photo.File):
+                    photoLinks[photo.File] = url;
+                    break;
+                case PhotoRequestKind when envelope.BodyAs<PhotoRequestBody>() is { } request:
+                    photosRequested.UnionWith(request.Files.Where(PhotoStore.IsValidName));
+                    break;
             }
         }
 
         if (incoming.Count > 0)
         {
             changed = (await _items.ApplyFromFamilyAsync(incoming)).Count > 0;
+            Preferences.Default.Remove("sync.awaiting." + home.Id);
         }
+
+        changed |= await ReceivePhotosAsync(home, photoLinks, cancellationToken);
+        await SendRequestedPhotosAsync(home, photosRequested, cancellationToken);
+        await RequestMissingPhotosAsync(home, cancellationToken);
 
         if (stateRequested && (GetTime("sync.statereply." + home.Id) is not { } replied || _clock.Now - replied > StateReplyAtMostEvery))
         {
@@ -236,14 +282,96 @@ public sealed class FamilySyncService
         }
     }
 
-    private async Task CheckInIfDueAsync(Home home, CancellationToken cancellationToken)
+    // ---- Photos: sent as encrypted files (ntfy.sh keeps files 3 hours); a phone that missed one asks again ----
+
+    private async Task<bool> ReceivePhotosAsync(Home home, Dictionary<string, Uri> links, CancellationToken cancellationToken)
     {
-        if (GetTime("sync.checkin." + home.Id) is { } last && _clock.Now - last < CheckInEvery)
+        if (links.Count == 0)
+        {
+            return false;
+        }
+
+        var wanted = (await _items.GetEverythingAsync(home.Id))
+            .Where(i => !i.IsDeleted && i.PhotoPath is not null && !PhotoStore.Exists(i.PhotoPath))
+            .Select(i => i.PhotoPath!)
+            .ToHashSet();
+        var received = false;
+        foreach (var (file, url) in links.Where(l => wanted.Contains(l.Key)))
+        {
+            try
+            {
+                var sealedBytes = await Relay(home).DownloadAsync(url, cancellationToken);
+                if (SealedBox.OpenBytes(home.Key!, sealedBytes, home.Id + "/" + file) is { } photo)
+                {
+                    await PhotoStore.SaveReceivedAsync(file, photo);
+                    received = true;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                // Expired (older than 3 hours): it is asked for again below.
+            }
+        }
+
+        return received;
+    }
+
+    private async Task RequestMissingPhotosAsync(Home home, CancellationToken cancellationToken)
+    {
+        var now = _clock.Now;
+        var missing = (await _items.GetEverythingAsync(home.Id))
+            .Where(i => !i.IsDeleted && !i.IsClosed && PhotoStore.IsValidName(i.PhotoPath) && !PhotoStore.Exists(i.PhotoPath))
+            .Select(i => i.PhotoPath!)
+            .Where(f => GetTime("sync.photoask." + f) is not { } asked || now - asked > PhotoAskAgainAfter)
+            .Take(20)
+            .ToList();
+        if (missing.Count == 0)
         {
             return;
         }
 
-        await Relay(home).PublishAsync(home.Topic!, Encode(home, CheckInKind, new EmptyBody()), cancellationToken);
+        await Relay(home).PublishAsync(home.Topic!, Encode(home, PhotoRequestKind, new PhotoRequestBody(missing)), cancellationToken);
+        foreach (var file in missing)
+        {
+            SetTime("sync.photoask." + file, now);
+        }
+    }
+
+    private async Task SendRequestedPhotosAsync(Home home, IEnumerable<string> files, CancellationToken cancellationToken)
+    {
+        foreach (var file in files)
+        {
+            if (GetTime("sync.photosent." + file) is { } sent && _clock.Now - sent < PhotoResendAtMostEvery)
+            {
+                continue; // Another request for the same photo: it was just sent.
+            }
+
+            await SendPhotoAsync(home, file, cancellationToken);
+        }
+    }
+
+    private async Task SendPhotoAsync(Home home, string file, CancellationToken cancellationToken)
+    {
+        if (PhotoStore.ReadBytes(file) is not { } photo)
+        {
+            return;
+        }
+
+        var sealedBytes = SealedBox.SealBytes(home.Key!, photo, home.Id + "/" + file);
+        await Relay(home).PublishFileAsync(home.Topic!, sealedBytes, Encode(home, PhotoKind, new PhotoBody(file)), cancellationToken);
+        SetTime("sync.photosent." + file, _clock.Now);
+    }
+
+    private async Task CheckInIfDueAsync(Home home, CancellationToken cancellationToken)
+    {
+        // A phone restored from a backup checks in at once, telling the family which old phone it replaces.
+        var replaces = HomeService.ReplacesDeviceId;
+        if (replaces is null && GetTime("sync.checkin." + home.Id) is { } last && _clock.Now - last < CheckInEvery)
+        {
+            return;
+        }
+
+        await Relay(home).PublishAsync(home.Topic!, Encode(home, CheckInKind, new CheckInBody(replaces)), cancellationToken);
         SetTime("sync.checkin." + home.Id, _clock.Now);
     }
 
@@ -321,6 +449,13 @@ public sealed class FamilySyncService
 
         var items = (await _items.GetByIdsAsync(pending)).Where(i => i.HomeId == home.Id).ToList();
         await PublishItemsAsync(home, items, cancellationToken);
+        foreach (var file in items.Where(i => !i.IsDeleted && PhotoStore.Exists(i.PhotoPath)).Select(i => i.PhotoPath!))
+        {
+            if (GetTime("sync.photosent." + file) is null)
+            {
+                await SendPhotoAsync(home, file, cancellationToken);
+            }
+        }
 
         lock (_outboxLock)
         {

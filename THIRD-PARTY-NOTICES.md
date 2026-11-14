@@ -20,7 +20,9 @@ Dependencies shipped in the app, with their licenses. Checked at every release.
 
 | Service | Used for | Terms |
 |---|---|---|
-| [ntfy.sh](https://ntfy.sh) (open-source ntfy server, public instance) | Carrying a shared home's changes between family phones. Messages are encrypted on the phone (AES-256-GCM) with a key only the family's phones have; ntfy.sh keeps them for up to 12 hours. No account. The relay address can be changed to a self-hosted ntfy. | Free public service, used within its [terms](https://ntfy.sh/docs/privacy/) and limits (250 messages a day per internet connection) |
+| [ntfy.sh](https://ntfy.sh) (open-source ntfy server, public instance) | Carrying a shared home's changes and item photos between family phones (photos as encrypted files, kept by ntfy.sh for up to 3 hours). Messages are encrypted on the phone (AES-256-GCM) with a key only the family's phones have; ntfy.sh keeps them for up to 12 hours. No account. The relay address can be changed to a self-hosted ntfy. | Free public service, used within its [terms](https://ntfy.sh/docs/privacy/) and limits (250 messages a day per internet connection) |
+
+| Android backup (the user's own Google account; Samsung Smart Switch for phone-to-phone transfer) | Bringing the list, photos and settings to a new phone. Google backup is only allowed when it is end-to-end encrypted with the phone's screen lock (`disableIfNoEncryptionCapabilities`). The phone's own identity is never backed up. | Built into Android; no account in the app |
 
 ## Data
 

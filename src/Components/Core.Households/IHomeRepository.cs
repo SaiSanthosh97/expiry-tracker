@@ -15,4 +15,6 @@ public interface IHomeRepository
 
     /// <summary>Insert or replace.</summary>
     Task SaveDeviceAsync(FamilyDevice device);
+
+    Task DeleteDeviceAsync(string homeId, string deviceId);
 }
