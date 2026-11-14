@@ -63,6 +63,7 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
         Days = Enumerable.Range(1, 31).ToList();
 
         Title = AppResources.Add_Title;
+        _ = LoadHomesAsync();
         ResetDates();
         SelectCategory(Categories.First(c => c.Category.Id == DefaultPresets.PackagedFood.Id));
     }
@@ -76,6 +77,27 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
     public IReadOnlyList<int> Years { get; }
 
     public IReadOnlyList<int> Days { get; }
+
+    private IReadOnlyList<HomeTracker.Core.Households.Home> _homeList = [];
+
+    /// <summary>Names for the "Which home?" picker (shown when this phone is in more than one home).</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<string> HomeNames { get; set; } = [];
+
+    [ObservableProperty]
+    public partial int HomeIndex { get; set; } = -1;
+
+    [ObservableProperty]
+    public partial bool ShowHomePicker { get; set; }
+
+    private async Task LoadHomesAsync()
+    {
+        _homeList = await _homes.GetHomesAsync();
+        var current = await _homes.GetCurrentAsync();
+        HomeNames = _homeList.Select(h => h.Name).ToList();
+        HomeIndex = Math.Max(0, _homeList.ToList().FindIndex(h => h.Id == current.Id));
+        ShowHomePicker = _homeList.Count > 1 && _editing is null;
+    }
 
     [ObservableProperty]
     public partial string Title { get; set; }
@@ -167,6 +189,7 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
         _loading = true;
         var item = evaluation.Item;
         _editing = item;
+        ShowHomePicker = false;
         _barcode = item.Barcode;
         _originalPhoto = item.PhotoPath;
         PhotoFile = item.PhotoPath;
@@ -392,7 +415,14 @@ public sealed partial class AddItemViewModel : ObservableObject, IQueryAttributa
         }
 
         var item = BuildItem();
-        await _items.SaveAsync(item.HomeId is null ? item with { HomeId = (await _homes.GetCurrentAsync()).Id } : item);
+        if (_editing is null)
+        {
+            // New item: the chosen home, and who added it.
+            var homeId = HomeIndex >= 0 && HomeIndex < _homeList.Count ? _homeList[HomeIndex].Id : (await _homes.GetCurrentAsync()).Id;
+            item = item with { HomeId = homeId, AddedBy = _homes.Me.Name };
+        }
+
+        await _items.SaveAsync(item);
         if (_originalPhoto != PhotoFile)
         {
             PhotoStore.Delete(_originalPhoto);

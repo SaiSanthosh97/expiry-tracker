@@ -53,6 +53,12 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Which home (only with more than one home) -->
+                <VerticalStackLayout IsVisible="{Binding ShowHomePicker}">
+                    <Label Text="{x:Static s:AppResources.Add_WhichHome}" Style="{StaticResource SectionLabel}" />
+                    <Picker ItemsSource="{Binding HomeNames}" SelectedIndex="{Binding HomeIndex}" FontSize="20" />
+                </VerticalStackLayout>
+
                 <Label Text="{x:Static s:AppResources.Add_NameLabel}" Style="{StaticResource SectionLabel}" />
                 <Entry Text="{Binding Name}" Placeholder="{x:Static s:AppResources.Add_NamePlaceholder}" ReturnType="Done" />
                 <Label Text="{Binding ScanNote}" IsVisible="{Binding HasScanNote}" Style="{StaticResource Subtle}" Margin="4,2,0,0" />

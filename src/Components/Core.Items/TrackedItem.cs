@@ -23,6 +23,9 @@ public sealed record TrackedItem
 
     public int Quantity { get; init; } = 1;
 
+    /// <summary>Name of the person who added the item (as they set it on their phone), when known.</summary>
+    public string? AddedBy { get; init; }
+
     /// <summary>Product barcode (EAN/UPC), when scanned. Lets the household's own history name the product next time.</summary>
     public string? Barcode { get; init; }
 

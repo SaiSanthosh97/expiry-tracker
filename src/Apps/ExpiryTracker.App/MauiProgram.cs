@@ -84,6 +84,8 @@ public static class MauiProgram
 		services.AddTransient<UpdatePage>();
 		services.AddTransient<FamilyViewModel>();
 		services.AddTransient<FamilyPage>();
+		services.AddTransient<HomesViewModel>();
+		services.AddTransient<HomesPage>();
 
 		var app = builder.Build();
 

@@ -110,11 +110,14 @@ public sealed class FamilySyncService
         {
             var replacing = HomeService.ReplacesDeviceId is not null;
             var allOk = true;
-            foreach (var home in (await _homes.GetHomesAsync()).Where(h => h.IsShared))
+            var allHomes = await _homes.GetHomesAsync();
+            foreach (var home in allHomes.Where(h => h.IsShared))
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 allOk &= await SyncHomeAsync(home, cancellationToken);
             }
+
+            await DropUnsharedFromOutboxAsync(allHomes);
 
             if (replacing && allOk)
             {
@@ -124,6 +127,11 @@ public sealed class FamilySyncService
         catch (OperationCanceledException)
         {
             // Stopped by Android or the app went to the background; the next run continues.
+        }
+        catch (Exception ex)
+        {
+            // Never let one bad run stop syncing for good; the next run tries again.
+            Android.Util.Log.Error("HomeTracker", $"Family sync failed: {ex}");
         }
         finally
         {
@@ -461,6 +469,32 @@ public sealed class FamilySyncService
         {
             var outbox = ReadOutbox();
             outbox.ExceptWith(items.Select(i => i.Id));
+            Preferences.Default.Set(OutboxKey, JsonSerializer.Serialize(outbox));
+        }
+    }
+
+    /// <summary>Changes in homes that aren't shared have nowhere to go; when a home starts sharing, its whole list is sent anyway.</summary>
+    private async Task DropUnsharedFromOutboxAsync(IReadOnlyList<Home> allHomes)
+    {
+        HashSet<string> pending;
+        lock (_outboxLock)
+        {
+            pending = ReadOutbox();
+        }
+
+        if (pending.Count == 0)
+        {
+            return;
+        }
+
+        var shared = allHomes.Where(h => h.IsShared).Select(h => h.Id).ToHashSet();
+        var drop = (await _items.GetByIdsAsync(pending)).Where(i => i.HomeId is null || !shared.Contains(i.HomeId)).Select(i => i.Id).ToList();
+        var gone = pending.Except((await _items.GetByIdsAsync(pending)).Select(i => i.Id));
+        lock (_outboxLock)
+        {
+            var outbox = ReadOutbox();
+            outbox.ExceptWith(drop);
+            outbox.ExceptWith(gone);
             Preferences.Default.Set(OutboxKey, JsonSerializer.Serialize(outbox));
         }
     }

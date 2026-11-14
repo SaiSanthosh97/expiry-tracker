@@ -15,6 +15,7 @@ public sealed class HomeService(IHomeRepository repository, ItemService items, C
     private const string ReplacesKey = "device.replaces";
     private const string DeviceNameKey = "device.name";
     private const string RemindKeyPrefix = "home.remind.";
+    private const string ViewAllKey = "home.view-all";
 
     private readonly SemaphoreSlim _lock = new(1, 1);
 
@@ -110,8 +111,31 @@ public sealed class HomeService(IHomeRepository repository, ItemService items, C
     public void SetCurrent(string homeId)
     {
         Preferences.Default.Set(CurrentKey, homeId);
+        Preferences.Default.Set(ViewAllKey, false);
         Changed?.Invoke(this, EventArgs.Empty);
     }
+
+    /// <summary>True when the main screen shows every home at once ("All homes").</summary>
+    public static bool ViewAll => Preferences.Default.Get(ViewAllKey, false);
+
+    public void SetViewAll()
+    {
+        Preferences.Default.Set(ViewAllKey, true);
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Creates another home on this phone (e.g. "Ravi's flat") and shows it.</summary>
+    public async Task<Home> CreateAsync(string name)
+    {
+        await GetHomesAsync();
+        var home = Home.CreateLocal(name.Trim(), clock.Now);
+        await repository.SaveHomeAsync(home);
+        SetCurrent(home.Id);
+        return home;
+    }
+
+    /// <summary>False until the person has typed their own name (the phone model name is only a placeholder).</summary>
+    public bool HasChosenName => Preferences.Default.ContainsKey(DeviceNameKey);
 
     public async Task<Home> RenameAsync(Home home, string name)
     {
@@ -144,7 +168,7 @@ public sealed class HomeService(IHomeRepository repository, ItemService items, C
 
         // An unused, empty "My home" from first start is replaced by the joined home.
         var homes = await repository.GetHomesAsync();
-        foreach (var other in homes.Where(h => h.Id != home.Id && !h.IsShared))
+        foreach (var other in homes.Where(h => h.Id != home.Id && !h.IsShared && h.Name == AppResources.Home_DefaultName))
         {
             if ((await items.GetEverythingAsync(other.Id)).Count == 0)
             {

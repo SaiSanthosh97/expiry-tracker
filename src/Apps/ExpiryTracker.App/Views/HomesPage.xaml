@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.HomesPage"
+             x:DataType="vm:HomesViewModel"
+             Title="{x:Static s:AppResources.Homes_Title}">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16,8,16,32" Spacing="12">
+
+                <Label Text="{x:Static s:AppResources.Homes_Intro}" Style="{StaticResource Subtle}" />
+
+                <!-- The homes this phone is in -->
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Homes}" Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:HomeRow">
+                            <Border Style="{StaticResource Card}" Padding="16,12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomesViewModel}}, Path=OpenCommand, x:DataType=vm:HomesViewModel}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding Name}" FontFamily="OpenSansSemibold" FontSize="21" />
+                                        <Label Text="{Binding Detail}" Style="{StaticResource Subtle}" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="›" FontSize="30" VerticalOptions="Center" TextColor="{StaticResource Primary}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Button Text="{x:Static s:AppResources.Homes_New}" Command="{Binding NewHomeCommand}" FontSize="18" HeightRequest="60" />
+                    <Button Grid.Column="1" Text="{x:Static s:AppResources.Homes_Join}" Command="{Binding JoinCommand}" FontSize="18" HeightRequest="60" />
+                </Grid>
+                <Label Text="{x:Static s:AppResources.Family_JoinHelp}" Style="{StaticResource Subtle}" />
+
+                <!-- Your name -->
+                <Label Text="{x:Static s:AppResources.Homes_YourName}" Style="{StaticResource SectionLabel}" FontSize="22" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Label Text="{Binding YourName}" VerticalOptions="Center" FontSize="19" />
+                    <Button Grid.Column="1" Text="{x:Static s:AppResources.Family_Change}" Command="{Binding ChangeNameCommand}" Style="{StaticResource OutlineButton}" />
+                </Grid>
+                <Label Text="{x:Static s:AppResources.Homes_YourNameUse}" Style="{StaticResource Subtle}" />
+
+                <Button Text="{x:Static s:AppResources.Move_Button}" Command="{Binding MoveToNewPhoneCommand}" Style="{StaticResource OutlineButton}" Margin="0,12,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#66000000">
+            <ActivityIndicator IsRunning="{Binding IsBusy}" Color="White" HeightRequest="56" WidthRequest="56" VerticalOptions="Center" HorizontalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

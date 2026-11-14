@@ -11,7 +11,8 @@ public sealed class WidgetSource(ItemService items, HomeService homes, UndoServi
     public async Task<HomeWidgetContent> BuildAsync(DateOnly today)
     {
         var home = await homes.GetCurrentAsync();
-        var sections = ItemLists.ForHome(await items.GetOpenAsync(home.Id), null);
+        var all = HomeService.ViewAll && (await homes.GetHomesAsync()).Count > 1;
+        var sections = ItemLists.ForHome(all ? await items.GetOpenAsync() : await items.GetOpenAsync(home.Id), null);
         var attention = sections.Expired.Count + sections.UseSoon.Count;
 
         var rows = sections.Expired.Concat(sections.UseSoon).Concat(sections.Fresh)

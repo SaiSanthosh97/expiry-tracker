@@ -46,6 +46,8 @@ public sealed class SqliteItemRepositoryTests : IAsyncLifetime
             ReminderLeadDays = 5,
             SnoozedUntil = new DateOnly(2026, 11, 12),
             PhotoPath = "photo.jpg",
+            AddedBy = "Ravi",
+            HomeId = "home-1",
         };
 
         await _repository.SaveAsync(item);

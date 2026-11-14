@@ -116,7 +116,7 @@ public sealed partial class SettingsViewModel(
     }
 
     [RelayCommand]
-    private Task OpenFamilyAsync() => Shell.Current.GoToAsync("family");
+    private Task OpenFamilyAsync() => Shell.Current.GoToAsync("homes");
 
     [RelayCommand]
     private Task OpenSourceCodeAsync() => Launcher.Default.OpenAsync(UpdateService.RepositoryUrl);

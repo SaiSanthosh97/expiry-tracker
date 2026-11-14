@@ -77,7 +77,8 @@ public sealed partial class ItemViewModel(ItemService items, UndoService undo, D
         CanMarkOpened = item.OpenedDate is null && item.ShelfLifeFromAdded is null;
 
         Details.Clear();
-        Details.Add(new DetailRow(AppResources.Item_Added, Text.Date(item.AddedDate)));
+        Details.Add(new DetailRow(AppResources.Item_Added, Text.Date(item.AddedDate)
+            + (string.IsNullOrEmpty(item.AddedBy) ? "" : " · " + string.Format(AppResources.Item_By, item.AddedBy))));
         if (item.PrintedExpiry is { } printed)
         {
             Details.Add(new DetailRow(AppResources.Item_PackExpiry, Text.Date(printed)));

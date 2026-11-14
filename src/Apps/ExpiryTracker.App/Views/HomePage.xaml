@@ -8,16 +8,51 @@
              Title="{Binding Title}">
 
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{x:Static s:AppResources.Home_Refresh}" Command="{Binding RefreshCommand}" />
         <ToolbarItem Text="{x:Static s:AppResources.Home_Family}" Command="{Binding FamilyCommand}" />
         <ToolbarItem Text="{x:Static s:AppResources.Home_Settings}" Command="{Binding SettingsCommand}" />
     </ContentPage.ToolbarItems>
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+        <!-- Homes: All homes / Amma's house / Ravi's flat (only with more than one home) -->
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding HomeChips}"
+                        IsVisible="{Binding HasManyHomes}"
+                        ItemsLayout="HorizontalList"
+                        HorizontalScrollBarVisibility="Never"
+                        Margin="16,12,16,0"
+                        HeightRequest="64">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:HomeChip">
+                    <Border Style="{StaticResource Chip}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=SelectHomeCommand, x:DataType=vm:HomeViewModel}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Label Text="{Binding Label}" FontSize="18" VerticalOptions="Center" FontFamily="OpenSansSemibold">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="TextColor" Value="{StaticResource OnPrimary}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
         <!-- Filter chips: All / Food / Medicines / Other -->
-        <CollectionView Grid.Row="0"
+        <CollectionView Grid.Row="1"
                         ItemsSource="{Binding Filters}"
                         ItemsLayout="HorizontalList"
+                        HorizontalScrollBarVisibility="Never"
                         Margin="16,12,16,4"
                         HeightRequest="64">
             <CollectionView.ItemTemplate>
@@ -46,8 +81,9 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- Items, grouped: Expired, Use soon, Fine, No date -->
-        <CollectionView Grid.Row="1"
+        <!-- Items, grouped: Expired, Use soon, Fine, No date. Pull down to refresh. -->
+        <RefreshView Grid.Row="2" Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}" RefreshColor="{StaticResource Primary}">
+        <CollectionView
                         ItemsSource="{Binding Groups}"
                         IsGrouped="True"
                         Margin="16,0">
@@ -85,9 +121,10 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        </RefreshView>
 
         <!-- Undo bar after Used up / Thrown away -->
-        <Border Grid.Row="2"
+        <Border Grid.Row="3"
                 IsVisible="{Binding HasUndo}"
                 BackgroundColor="#323232"
                 StrokeThickness="0"
@@ -104,7 +141,7 @@
             </Grid>
         </Border>
 
-        <Button Grid.Row="3"
+        <Button Grid.Row="4"
                 Text="{x:Static s:AppResources.Home_AddItem}"
                 Command="{Binding AddCommand}"
                 FontSize="24"

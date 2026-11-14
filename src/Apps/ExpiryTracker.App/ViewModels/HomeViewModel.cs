@@ -9,6 +9,17 @@ using HomeTracker.Core.ShelfLife;
 
 namespace ExpiryTracker.App.ViewModels;
 
+/// <summary>A home to show on the main screen; Id null means "All homes".</summary>
+public sealed partial class HomeChip(string? id, string label) : ObservableObject
+{
+    public string? Id { get; } = id;
+
+    public string Label { get; } = label;
+
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
+}
+
 public sealed record ItemCard(string Id, string Name, string Details, string StatusText, Color StatusColor, ImageSource? Photo)
 {
     public bool HasPhoto => Photo is not null;
@@ -35,6 +46,7 @@ public sealed partial class HomeViewModel : ObservableObject
 {
     private readonly ItemService _items;
     private readonly HomeService _homes;
+    private readonly FamilySyncService _sync;
     private readonly UndoService _undo;
     private CancellationTokenSource? _undoTimer;
     private string? _undoItemId;
@@ -43,6 +55,7 @@ public sealed partial class HomeViewModel : ObservableObject
     {
         _items = items;
         _homes = homes;
+        _sync = sync;
         _undo = undo;
         Filters =
         [
@@ -58,9 +71,17 @@ public sealed partial class HomeViewModel : ObservableObject
 
     public ObservableCollection<FilterChip> Filters { get; }
 
-    /// <summary>The app name, or the home's name when this phone is in more than one home.</summary>
     [ObservableProperty]
     public partial string Title { get; set; } = AppResources.AppName;
+
+    /// <summary>"All homes" plus each home; shown when this phone is in more than one home.</summary>
+    public ObservableCollection<HomeChip> HomeChips { get; } = [];
+
+    [ObservableProperty]
+    public partial bool HasManyHomes { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRefreshing { get; set; }
 
     public ObservableCollection<ItemGroup> Groups { get; } = [];
 
@@ -76,9 +97,23 @@ public sealed partial class HomeViewModel : ObservableObject
     public async Task LoadAsync()
     {
         var group = Filters.First(f => f.IsSelected).Group;
+        var all = await _homes.GetHomesAsync();
         var home = await _homes.GetCurrentAsync();
-        Title = (await _homes.GetHomesAsync()).Count > 1 ? home.Name : AppResources.AppName;
-        var sections = ItemLists.ForHome(await _items.GetOpenAsync(home.Id), group);
+        var viewAll = HomeService.ViewAll && all.Count > 1;
+        HasManyHomes = all.Count > 1;
+        HomeChips.Clear();
+        if (HasManyHomes)
+        {
+            HomeChips.Add(new HomeChip(null, AppResources.Home_AllHomes) { IsSelected = viewAll });
+            foreach (var h in all)
+            {
+                HomeChips.Add(new HomeChip(h.Id, h.Name) { IsSelected = !viewAll && h.Id == home.Id });
+            }
+        }
+
+        _homeNames = viewAll ? all.ToDictionary(h => h.Id, h => h.Name) : null;
+        _myName = _homes.Me.Name;
+        var sections = ItemLists.ForHome(viewAll ? await _items.GetOpenAsync() : await _items.GetOpenAsync(home.Id), group);
 
         Groups.Clear();
         AddGroup(AppResources.Section_Expired, Palette.Expired, sections.Expired);
@@ -98,9 +133,23 @@ public sealed partial class HomeViewModel : ObservableObject
         }
     }
 
-    private static ItemCard ToCard(ItemEvaluation e)
+    private Dictionary<string, string>? _homeNames;
+    private string _myName = "";
+
+    private ItemCard ToCard(ItemEvaluation e)
     {
         var details = Text.Category(e.Item.CategoryId);
+        // "All homes": say which home; and who added it, when it wasn't this person.
+        if (_homeNames is not null && e.Item.HomeId is { } homeId && _homeNames.TryGetValue(homeId, out var homeName))
+        {
+            details = homeName + " · " + details;
+        }
+
+        if (!string.IsNullOrEmpty(e.Item.AddedBy) && e.Item.AddedBy != _myName)
+        {
+            details += " · " + string.Format(AppResources.Item_By, e.Item.AddedBy);
+        }
+
         if (e.Item.OpenedDate is not null)
         {
             details += " · " + AppResources.Status_Opened;
@@ -166,6 +215,37 @@ public sealed partial class HomeViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task SelectHomeAsync(HomeChip chip)
+    {
+        if (chip.Id is null)
+        {
+            _homes.SetViewAll();
+        }
+        else
+        {
+            _homes.SetCurrent(chip.Id);
+        }
+
+        await LoadAsync();
+    }
+
+    /// <summary>Fetches family changes now instead of waiting for the next automatic check.</summary>
+    [RelayCommand]
+    private async Task RefreshAsync()
+    {
+        IsRefreshing = true;
+        try
+        {
+            await _sync.SyncNowAsync();
+            await LoadAsync();
+        }
+        finally
+        {
+            IsRefreshing = false;
+        }
+    }
+
+    [RelayCommand]
     private Task AddAsync() => Shell.Current.GoToAsync("add");
 
     [RelayCommand]
@@ -175,5 +255,5 @@ public sealed partial class HomeViewModel : ObservableObject
     private Task SettingsAsync() => Shell.Current.GoToAsync("settings");
 
     [RelayCommand]
-    private Task FamilyAsync() => Shell.Current.GoToAsync("family");
+    private Task FamilyAsync() => Shell.Current.GoToAsync("homes");
 }

@@ -4,22 +4,17 @@ using CommunityToolkit.Mvvm.Input;
 using ExpiryTracker.App.Resources.Strings;
 using ExpiryTracker.App.Services;
 using HomeTracker.Core.Households;
-using HomeTracker.Core.LabelCapture;
 using QRCoder;
 
 namespace ExpiryTracker.App.ViewModels;
 
 public sealed record MemberRow(string Name, string Detail, bool IsSilent);
 
-/// <summary>Family screen: share this home, invite family, join another home, see the family's phones.</summary>
-public sealed partial class FamilyViewModel(
-    HomeService homes,
-    FamilySyncService sync,
-    ScanService scan,
-    IBarcodeReader barcodes,
-    Dialogs dialogs,
-    Clock clock) : ObservableObject
+/// <summary>One home: share it, invite people, see whose phones are in it, rename, leave.</summary>
+public sealed partial class FamilyViewModel(HomeService homes, FamilySyncService sync, Dialogs dialogs, Clock clock)
+    : ObservableObject, IQueryAttributable
 {
+    private string? _homeId;
     private Home? _home;
     private bool _loading;
 
@@ -39,28 +34,30 @@ public sealed partial class FamilyViewModel(
     public partial ImageSource? InviteQr { get; set; }
 
     [ObservableProperty]
-    public partial bool HasManyHomes { get; set; }
-
-    [ObservableProperty]
     public partial bool RemindThisHome { get; set; } = true;
-
-    [ObservableProperty]
-    public partial string DeviceName { get; set; } = "";
 
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
 
     public ObservableCollection<MemberRow> Members { get; } = [];
 
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue("id", out var id) && id is string homeId)
+        {
+            _homeId = homeId;
+        }
+    }
+
     public async Task LoadAsync()
     {
+        var home = (_homeId is null ? null : await homes.GetAsync(_homeId)) ?? await homes.GetCurrentAsync();
         _loading = true;
-        var home = _home = await homes.GetCurrentAsync();
+        _home = home;
+        _homeId = home.Id;
         HomeName = home.Name;
         IsShared = home.IsShared;
-        HasManyHomes = (await homes.GetHomesAsync()).Count > 1;
         RemindThisHome = HomeService.GetRemind(home.Id);
-        DeviceName = homes.Me.Name;
         StatusText = !home.IsShared
             ? AppResources.Family_NotShared
             : FamilySyncService.LastSync(home.Id) is { } last
@@ -90,7 +87,7 @@ public sealed partial class FamilyViewModel(
     [RelayCommand]
     private async Task ShareAsync()
     {
-        if (_home is null)
+        if (_home is null || !await HomesViewModel.EnsureNameAsync(homes, dialogs))
         {
             return;
         }
@@ -117,138 +114,6 @@ public sealed partial class FamilyViewModel(
     }
 
     [RelayCommand]
-    private async Task JoinAsync()
-    {
-        var invite = await FindInviteAsync();
-        if (invite is null)
-        {
-            return;
-        }
-
-        var confirmed = await dialogs.ConfirmAsync(
-            AppResources.Family_JoinTitle,
-            string.Format(AppResources.Family_JoinConfirm, invite.Name),
-            AppResources.Family_JoinButton,
-            AppResources.Common_Cancel);
-        if (!confirmed)
-        {
-            return;
-        }
-
-        IsBusy = true;
-        try
-        {
-            var home = await homes.JoinAsync(invite);
-            await sync.AfterJoinAsync(home);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-
-        await LoadAsync();
-        await dialogs.AlertAsync(AppResources.Family_JoinedTitle, string.Format(AppResources.Family_JoinedText, invite.Name));
-    }
-
-    /// <summary>An invite copied from WhatsApp is used straight away; otherwise read a QR photo or pasted text.</summary>
-    private async Task<Home?> FindInviteAsync()
-    {
-        try
-        {
-            if (Clipboard.Default.HasText && HomeInvite.TryDecode(await Clipboard.Default.GetTextAsync(), clock.Now, out var copied))
-            {
-                return copied;
-            }
-        }
-        catch (Exception ex) when (ex is not OutOfMemoryException)
-        {
-            // Clipboard not available; fall through to the other ways.
-        }
-
-        var choice = await dialogs.ChooseAsync(AppResources.Family_JoinTitle, AppResources.Family_JoinByQr, AppResources.Family_JoinByPaste);
-        if (choice == AppResources.Family_JoinByQr)
-        {
-            var photo = await scan.GetPhotoAsync(AppResources.Family_JoinByQr);
-            if (photo is null)
-            {
-                return null;
-            }
-
-            try
-            {
-                IsBusy = true;
-                foreach (var code in await barcodes.ReadAsync(photo))
-                {
-                    if (HomeInvite.TryDecode(code.Value, clock.Now, out var scanned))
-                    {
-                        return scanned;
-                    }
-                }
-            }
-            finally
-            {
-                IsBusy = false;
-                ScanService.Discard(photo);
-            }
-
-            await dialogs.AlertAsync(AppResources.Family_JoinTitle, AppResources.Family_NoQr);
-            return null;
-        }
-
-        if (choice == AppResources.Family_JoinByPaste)
-        {
-            var text = await dialogs.PromptAsync(AppResources.Family_JoinTitle, AppResources.Family_PasteHint);
-            if (text is null)
-            {
-                return null;
-            }
-
-            if (HomeInvite.TryDecode(text, clock.Now, out var pasted))
-            {
-                return pasted;
-            }
-
-            await dialogs.AlertAsync(AppResources.Family_JoinTitle, AppResources.Family_BadInvite);
-        }
-
-        return null;
-    }
-
-    /// <summary>Explains the two ways to move to a new phone, and offers to share the list if it isn't yet.</summary>
-    [RelayCommand]
-    private async Task MoveToNewPhoneAsync()
-    {
-        if (_home is null)
-        {
-            return;
-        }
-
-        if (_home.IsShared)
-        {
-            await dialogs.AlertAsync(AppResources.Move_Title, AppResources.Move_TextShared);
-            return;
-        }
-
-        var share = await dialogs.ConfirmAsync(AppResources.Move_Title, AppResources.Move_TextNotShared, AppResources.Move_ShareNow, AppResources.Common_Cancel);
-        if (share)
-        {
-            await ShareAsync();
-        }
-    }
-
-    [RelayCommand]
-    private async Task SwitchHomeAsync()
-    {
-        var all = await homes.GetHomesAsync();
-        var picked = await dialogs.ChooseAsync(AppResources.Family_SwitchHome, all.Select(h => h.Name).ToArray());
-        if (all.FirstOrDefault(h => h.Name == picked) is { } home)
-        {
-            homes.SetCurrent(home.Id);
-            await LoadAsync();
-        }
-    }
-
-    [RelayCommand]
     private async Task RenameAsync()
     {
         if (_home is null || await dialogs.PromptAsync(AppResources.Family_Rename, AppResources.Family_HomeNameHint, _home.Name) is not { Length: > 0 } name)
@@ -257,18 +122,6 @@ public sealed partial class FamilyViewModel(
         }
 
         await homes.RenameAsync(_home, name);
-        await LoadAsync();
-    }
-
-    [RelayCommand]
-    private async Task ChangeDeviceNameAsync()
-    {
-        if (await dialogs.PromptAsync(AppResources.Family_PhoneName, AppResources.Family_PhoneNameHint, DeviceName) is not { Length: > 0 } name)
-        {
-            return;
-        }
-
-        homes.SetDeviceName(name);
         await LoadAsync();
     }
 
@@ -298,7 +151,7 @@ public sealed partial class FamilyViewModel(
 
         var confirmed = await dialogs.ConfirmAsync(
             string.Format(AppResources.Family_LeaveTitle, _home.Name),
-            AppResources.Family_LeaveText,
+            _home.IsShared ? AppResources.Family_LeaveText : AppResources.Homes_DeleteText,
             AppResources.Family_LeaveButton,
             AppResources.Common_Cancel);
         if (!confirmed)
@@ -308,7 +161,7 @@ public sealed partial class FamilyViewModel(
 
         await homes.LeaveAsync(_home);
         await sync.UpdateBackgroundAsync();
-        await LoadAsync();
+        await Shell.Current.GoToAsync("..");
     }
 
     private static ImageSource QrImage(string text)
