@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
              xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             xmlns:services="clr-namespace:ExpiryTracker.App.Services"
              x:Class="ExpiryTracker.App.Views.SettingsPage"
              x:DataType="vm:SettingsViewModel"
              Title="{x:Static s:AppResources.Settings_Title}">
@@ -51,7 +52,7 @@
                 </Grid>
             </Border>
 
-            <Border Style="{StaticResource Card}" Padding="14">
+            <Border Style="{StaticResource Card}" Padding="14" IsVisible="{x:Static services:Features.Medicines}">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <Label Text="{x:Static s:AppResources.Settings_OnTime}" VerticalOptions="Center" />
                     <Label Grid.Column="1" Text="{x:Static s:AppResources.Settings_Done}" TextColor="{StaticResource Fresh}"

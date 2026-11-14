@@ -270,6 +270,18 @@ Each family member chooses per Home / per person: **All alerts · Only missed do
 
 ---
 
+# How Homes Work (plain language)
+
+Think of each **home** as a **WhatsApp group** with its own list.
+
+- A phone can be in several homes, e.g. "Amma's house" and "Ravi's flat". The main screen can show one home or **All homes**.
+- **An invite (QR code or WhatsApp message) is for one home only.** Joining "Amma's house" does not add you to "Ravi's flat", even if the person who invited you is in both.
+- A home that was never shared exists **only on the phone that created it** ("Only on this phone" on the Homes screen). Share it first, then invite people.
+- To see two homes, a person joins each one with that home's invite. This is deliberate: each home decides who is in it (parents' house vs. a couple's flat).
+- Leaving a home removes its list from your phone only; the other phones keep it.
+
+---
+
 # Release Plan
 
 | Release | Contents |
@@ -281,7 +293,7 @@ Each family member chooses per Home / per person: **All alerts · Only missed do
 | **3. Family** (v0.4.0) | Done: share a home, invite by QR photo or WhatsApp text, several homes per phone with a switcher, **encrypted ntfy relay** sync (every minute while open, ~15 min in background, full resend after 12 h away), each phone's daily reminder covers every home (named when there are several), check-ins and "phone hasn't checked in for a day" alert. Deferred: direct Wi-Fi sync (the relay works at home too; Wi-Fi sync can't be tested on emulators), photo sharing, removing a phone by changing the home key |
 | **3.1 New phone + photos** (v0.5.0) | Photos shared with family through the relay (encrypted files, re-requested if missed); Android backup to the user's Google account (encrypted with the screen lock) and Smart Switch transfer; a restored phone gets a new identity and tells the family which phone it replaces; "Moving to a new phone?" guide; a newly joined phone keeps asking for the list until it arrives |
 | **3.2 Several homes** (v0.6.0) | Homes screen (create, join, open, remove), "All homes" view on the main screen with each item's home, choose the home when adding, "added by" on items, person's name instead of phone name, Refresh button and pull-to-refresh. Membership is per person: each person joins the homes they want to see |
-| **4. Medicines (Module 2)** (v0.7.0) | Done: Medicines tab; schedules (every day, every other day, chosen weekdays, when needed); dose alarm on the person's phone with TAKEN / LATER / SKIP, again at +10 and +30 min, missed at +60 (or 30 min after Later); exact alarms with "Alarms & reminders"; stock with "buy more" warnings; family sees today's doses and gets missed-dose and refill alerts through the relay. Next: SMS fallback (opt-in), linking a medicine to its strip's expiry |
+| **4. Medicines (Module 2)** (v0.7.0, **hidden since v0.7.1**) | Done: Medicines tab; schedules (every day, every other day, chosen weekdays, when needed); dose alarm on the person's phone with TAKEN / LATER / SKIP, again at +10 and +30 min, missed at +60 (or 30 min after Later); exact alarms with "Alarms & reminders"; stock with "buy more" warnings; family sees today's doses and gets missed-dose and refill alerts through the relay. Next: SMS fallback (opt-in), linking a medicine to its strip's expiry |
 | **5. Windows** | Windows build; ZXing.Net + Windows OCR implementations |
 
 ---
@@ -463,6 +475,34 @@ Release 4, built on the same components.
 - Schedules: fixed times daily, alternate days, weekdays, weekly; as-needed (SOS).
 - Child can see the parent's dose status (taken / missed today) from relay events, and vice versa.
 - Medicines are added by whoever is at the phone; remote editing from the child's phone arrives via relay events.
+
+
+## Decision (14 Nov 2026): medicines hidden for now
+
+Entering a medicine (person, name, how often, times, amount, stock, which phone) is too much for a first-time user, who may lose interest. From v0.7.1 the Medicines tab, dose alarms and missed-dose alerts are switched off in code (`Features.Medicines`). Everything is kept and still syncs, so it can be switched back on.
+
+**Before switching it back on – make adding a medicine quick:**
+- One screen: medicine name and three big buttons **Morning / Afternoon / Night** (default 1 tablet, every day, this phone rings). Everything else optional under "More".
+- Default person = the phone's owner; pick another person from chips.
+- Optional: photo of the strip to read the name (and expiry, linking it to the Expiry list).
+
+## Plan: making dose reminders stand out
+
+Many people keep dozens of uncleared notifications, so a dose reminder must not look like one more notification.
+
+| # | What | Status |
+|---|---|---|
+| 1 | Own high-priority channel "Medicine doses", pops up at the top (heads-up) | Built (0.7.0) |
+| 2 | Can't be swiped away until Taken / Later / Skip is pressed | Built |
+| 3 | Rings again at +10 and +30 min, then the family is told | Built |
+| 4 | **Full-screen alarm**, like an alarm clock: shows over the lock screen with the person's name, medicine, and big **Taken** / **Later** buttons; keeps ringing (up to a minute) until answered. Needs the "full-screen notifications" permission, asked with an explanation | To build |
+| 5 | **Alarm sound** (the phone's alarm volume and a distinct tone, not the normal notification sound) and a strong vibration pattern; option to sound even in Do Not Disturb | To build |
+| 6 | **Spoken reminder** (phone's own text-to-speech, free, works offline): "Appa, time for your BP tablet" – helps elderly users who don't read notifications | To build (optional per medicine) |
+| 7 | Pill icon and colour so it is recognisable among other apps' notifications | To build |
+| 8 | Samsung setup screen: Alarms & reminders, Unrestricted battery, lock-screen notifications shown | Partly built (Settings) |
+
+Expiry reminders stay quiet (once a day, normal priority) so they don't train people to ignore the medicine alarm.
+
 
 ---
 

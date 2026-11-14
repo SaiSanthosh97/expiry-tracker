@@ -35,6 +35,13 @@ public sealed class DoseEngine
     /// <summary>Brings notifications up to date, records missed doses and sets the next alarm.</summary>
     public async Task RunAsync()
     {
+        if (!Features.Medicines)
+        {
+            // Feature hidden: no alarms (cancels any set by 0.7.0).
+            TimedReminders.ScheduleAt(null);
+            return;
+        }
+
         await _running.WaitAsync();
         try
         {

@@ -366,7 +366,7 @@ public sealed class FamilySyncService
     /// </summary>
     private async Task AlertFamilyAsync(Home home, MedicinesChangedEventArgs applied)
     {
-        if (!HomeService.GetRemind(home.Id))
+        if (!Features.Medicines || !HomeService.GetRemind(home.Id))
         {
             return;
         }

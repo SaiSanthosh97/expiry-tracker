@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:ExpiryTracker.App.Views"
     xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+    xmlns:services="clr-namespace:ExpiryTracker.App.Services"
     Title="{x:Static s:AppResources.AppName}"
     FlyoutBehavior="Disabled">
 
@@ -17,9 +18,11 @@
                 <FontImageSource Glyph="🗓" Size="22" />
             </ShellContent.Icon>
         </ShellContent>
+        <!-- Hidden until adding a medicine is simpler (Features.Medicines). -->
         <ShellContent Title="{x:Static s:AppResources.Tab_Medicines}"
                       ContentTemplate="{DataTemplate views:MedicinesPage}"
-                      Route="medicines">
+                      Route="medicines"
+                      IsVisible="{x:Static services:Features.Medicines}">
             <ShellContent.Icon>
                 <FontImageSource Glyph="💊" Size="22" />
             </ShellContent.Icon>
