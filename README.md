@@ -1,4 +1,6 @@
-# Home Tracker
+# Use It Before
+
+The app is called **Use It Before** on the phone. In the code, projects and namespaces keep the earlier working name `HomeTracker`.
 
 Reminds your household before food, sweets, medicines and other items expire, and (later) helps family members keep track of each other's medicines.
 

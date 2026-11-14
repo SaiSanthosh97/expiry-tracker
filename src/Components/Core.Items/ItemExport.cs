@@ -32,12 +32,12 @@ public static class ItemExport
         }
         catch (JsonException ex)
         {
-            throw new FormatException("This file is not a Home Tracker list.", ex);
+            throw new FormatException("This file is not a list exported by this app.", ex);
         }
 
         if (file is null || file.Version < 1)
         {
-            throw new FormatException("This file is not a Home Tracker list.");
+            throw new FormatException("This file is not a list exported by this app.");
         }
 
         if (file.Version > FormatVersion)

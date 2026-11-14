@@ -63,7 +63,7 @@ public sealed partial class SettingsViewModel(
     [RelayCommand]
     private async Task ExportAsync()
     {
-        var path = Path.Combine(FileSystem.CacheDirectory, $"home-tracker-list-{clock.Today:yyyy-MM-dd}.json");
+        var path = Path.Combine(FileSystem.CacheDirectory, $"use-it-before-list-{clock.Today:yyyy-MM-dd}.json");
         await File.WriteAllTextAsync(path, await items.ExportAsync());
         await Share.Default.RequestAsync(new ShareFileRequest(AppResources.Settings_Export, new ShareFile(path, "application/json")));
     }

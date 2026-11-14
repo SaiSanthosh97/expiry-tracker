@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Name shown in the home-screen widget picker (overrides the widget component's default). -->
+    <string name="hometracker_widget_label">Use It Before</string>
+</resources>

@@ -26,7 +26,7 @@ public sealed class UpdateService(HttpClient http, AppSettings settings, Clock c
     {
         DeleteDownloads();
         Directory.CreateDirectory(DownloadFolder);
-        var path = Path.Combine(DownloadFolder, $"home-tracker-{update.Version.ToString(3)}.apk");
+        var path = Path.Combine(DownloadFolder, $"use-it-before-{update.Version.ToString(3)}.apk");
         await new UpdateDownloader(http).DownloadAsync(update, path, progress, cancellationToken);
         return path;
     }

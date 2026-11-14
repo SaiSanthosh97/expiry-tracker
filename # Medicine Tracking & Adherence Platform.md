@@ -1,5 +1,7 @@
 # Home Expiry Tracker & Medicine Platform
 
+> App name since v0.4.1: **Use It Before** (code name: Home Tracker).
+
 > Status: Product requirements v4 – **zero cost, free/open-source, no own server, remote family alerts, Samsung-first**. Ready for implementation.
 > Last updated: 2026-11-11
 
@@ -237,7 +239,7 @@ Each family member chooses per Home / per person: **All alerts · Only missed do
 - For **missed doses only** (urgent, must work without internet).
 - The patient's phone sends a plain SMS to the chosen family member's number using its own SIM. Most Indian mobile plans include 100 free SMS/day; the app sends at most a few per day and shows the expected count before the user enables it.
 - Personal phone-to-phone SMS, with explicit consent, is not bulk/commercial SMS, so no DLT registration is needed.
-- SMS text includes the medicine name: "Medicine reminder: Appa has not confirmed his 9 PM dose of Amlodipine 5mg. – Home Tracker". The opt-in screen tells the user that SMS is not encrypted (the mobile network can see it). A setting can hide the medicine name.
+- SMS text includes the medicine name: "Medicine reminder: Appa has not confirmed his 9 PM dose of Amlodipine 5mg. – Use It Before". The opt-in screen tells the user that SMS is not encrypted (the mobile network can see it). A setting can hide the medicine name.
 - The receiver doesn't need the app for this channel.
 - Disabled by default; turned on during family setup with a clear explanation.
 

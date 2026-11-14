@@ -4,7 +4,7 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="AppName" xml:space="preserve"><value>Home Tracker</value></data>
+  <data name="AppName" xml:space="preserve"><value>Use It Before</value></data>
   <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Common_OK" xml:space="preserve"><value>OK</value></data>
   <data name="Common_Delete" xml:space="preserve"><value>Delete</value></data>
@@ -98,7 +98,7 @@
   <data name="Settings_Battery" xml:space="preserve"><value>Battery saving turned off for this app</value></data>
   <data name="Settings_Fix" xml:space="preserve"><value>Fix</value></data>
   <data name="Settings_Done" xml:space="preserve"><value>✓ Done</value></data>
-  <data name="Settings_SamsungTip" xml:space="preserve"><value>Samsung phones: also open Settings → Battery → Background usage limits → Never sleeping apps, and add Home Tracker.</value></data>
+  <data name="Settings_SamsungTip" xml:space="preserve"><value>Samsung phones: also open Settings → Battery → Background usage limits → Never sleeping apps, and add Use It Before.</value></data>
   <data name="Settings_OpenAppSettings" xml:space="preserve"><value>Open app settings</value></data>
   <data name="Settings_TestReminder" xml:space="preserve"><value>Send a test reminder</value></data>
   <data name="Test_Title" xml:space="preserve"><value>Test reminder</value></data>
@@ -113,13 +113,13 @@
   <data name="Settings_CheckUpdates" xml:space="preserve"><value>Check for updates</value></data>
   <data name="Update_AvailableTitle" xml:space="preserve"><value>Update available</value></data>
   <data name="Update_AvailableText" xml:space="preserve"><value>Version {0} is ready. Download it now?</value></data>
-  <data name="Update_InstallHint" xml:space="preserve"><value>Home Tracker downloads it and opens Android&apos;s installer: tap Update. Your list is kept. On Samsung, turn off Auto Blocker first (Settings → Security and privacy) and turn it back on afterwards.</value></data>
+  <data name="Update_InstallHint" xml:space="preserve"><value>Use It Before downloads it and opens Android&apos;s installer: tap Update. Your list is kept. On Samsung, turn off Auto Blocker first (Settings → Security and privacy) and turn it back on afterwards.</value></data>
   <data name="Update_Download" xml:space="preserve"><value>Download</value></data>
   <data name="Update_Later" xml:space="preserve"><value>Later</value></data>
   <data name="Update_None" xml:space="preserve"><value>You have the latest version.</value></data>
   <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates. Check your internet connection.</value></data>
   <data name="Settings_About" xml:space="preserve"><value>About</value></data>
-  <data name="About_Disclaimer" xml:space="preserve"><value>Home Tracker only reminds you about dates that you or the pack provide. It does not give medical or food-safety advice. Always follow the label and your doctor or pharmacist.</value></data>
+  <data name="About_Disclaimer" xml:space="preserve"><value>Use It Before only reminds you about dates that you or the pack provide. It does not give medical or food-safety advice. Always follow the label and your doctor or pharmacist.</value></data>
   <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone. A small copy of each product photo is kept inside the app (not in your gallery) and deleted with the item. When a photo shows a barcode, only the barcode number is sent to Open Food Facts to find the product name. If you share a home with family, its list (not photos) goes through the free ntfy.sh relay, encrypted so only your family&apos;s phones can read it. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
   <data name="About_License" xml:space="preserve"><value>Free and open source (MIT License).</value></data>
   <data name="About_SourceCode" xml:space="preserve"><value>Source code on GitHub</value></data>
@@ -127,11 +127,11 @@
   <data name="Reminder_ChannelDescription" xml:space="preserve"><value>Tells you before things expire</value></data>
   <data name="Reminder_SingleTitle" xml:space="preserve"><value>{0} – {1}</value></data>
   <data name="Reminder_ManyTitle" xml:space="preserve"><value>{0} items need attention</value></data>
-  <data name="Reminder_TapToOpen" xml:space="preserve"><value>Tap to open Home Tracker</value></data>
+  <data name="Reminder_TapToOpen" xml:space="preserve"><value>Tap to open Use It Before</value></data>
   <data name="Reminder_UsedUp" xml:space="preserve"><value>Used up</value></data>
   <data name="Reminder_Thrown" xml:space="preserve"><value>Thrown</value></data>
   <data name="Reminder_Tomorrow" xml:space="preserve"><value>Remind tomorrow</value></data>
-  <data name="Welcome_Title" xml:space="preserve"><value>Welcome to Home Tracker</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>Welcome to Use It Before</value></data>
   <data name="Welcome_Continue" xml:space="preserve"><value>Continue</value></data>
   <data name="Notifications_Denied" xml:space="preserve"><value>Without notifications the app can&apos;t remind you. You can allow them later in Settings.</value></data>
   <data name="Scan_Section" xml:space="preserve"><value>Take a photo of the product: the app reads its name and date. If the date is on another side, use “Date”.</value></data>
@@ -159,13 +159,13 @@
   <data name="Widget_OneNeedsAttention" xml:space="preserve"><value>1 needs attention</value></data>
   <data name="Widget_ManyNeedAttention" xml:space="preserve"><value>{0} need attention</value></data>
   <data name="Widget_Empty" xml:space="preserve"><value>Nothing to remind you about. Tap + Add to add an item.</value></data>
-  <data name="Widget_UsedToast" xml:space="preserve"><value>{0}: marked as used up. To undo, open Home Tracker within 5 minutes.</value></data>
-  <data name="Update_Title" xml:space="preserve"><value>Updating Home Tracker</value></data>
+  <data name="Widget_UsedToast" xml:space="preserve"><value>{0}: marked as used up. To undo, open Use It Before within 5 minutes.</value></data>
+  <data name="Update_Title" xml:space="preserve"><value>Updating Use It Before</value></data>
   <data name="Update_Downloading" xml:space="preserve"><value>Downloading version {0}…</value></data>
   <data name="Update_Progress" xml:space="preserve"><value>{0}% done</value></data>
   <data name="Update_Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Update_AllowTitle" xml:space="preserve"><value>One-time permission</value></data>
-  <data name="Update_AllowText" xml:space="preserve"><value>Android needs your permission to install updates from Home Tracker. On the next screen, turn on “Allow from this source”, then come back here.</value></data>
+  <data name="Update_AllowText" xml:space="preserve"><value>Android needs your permission to install updates from Use It Before. On the next screen, turn on “Allow from this source”, then come back here.</value></data>
   <data name="Update_AllowButton" xml:space="preserve"><value>Open the setting</value></data>
   <data name="Update_InstallButton" xml:space="preserve"><value>Install now</value></data>
   <data name="Update_Ready" xml:space="preserve"><value>Downloaded. Tap “Install now”, then Update on Android&apos;s screen.</value></data>
@@ -189,12 +189,12 @@
   <data name="Family_ShareIntro" xml:space="preserve"><value>Share this list with family phones. Everyone sees the same items, and changes reach each phone within about 15 minutes – also when you are away from home. Everything is encrypted on the phone before it is sent.</value></data>
   <data name="Family_ShareButton" xml:space="preserve"><value>Share with family</value></data>
   <data name="Family_SharedTitle" xml:space="preserve"><value>Ready to share</value></data>
-  <data name="Family_SharedText" xml:space="preserve"><value>Now invite family: let them scan the QR code with Home Tracker, or tap “Send invite” to send it on WhatsApp.</value></data>
+  <data name="Family_SharedText" xml:space="preserve"><value>Now invite family: let them scan the QR code with Use It Before, or tap “Send invite” to send it on WhatsApp.</value></data>
   <data name="Family_InviteHeading" xml:space="preserve"><value>Invite family</value></data>
-  <data name="Family_InviteHelp" xml:space="preserve"><value>On the other phone: Home Tracker → Family → Join a family home, then take a photo of this code. Or send the invite on WhatsApp and copy it there.</value></data>
+  <data name="Family_InviteHelp" xml:space="preserve"><value>On the other phone: Use It Before → Family → Join a family home, then take a photo of this code. Or send the invite on WhatsApp and copy it there.</value></data>
   <data name="Family_SendInvite" xml:space="preserve"><value>Send invite (WhatsApp…)</value></data>
-  <data name="Family_InviteMessage" xml:space="preserve"><value>Join our Home Tracker list “{0}”.
-Copy this whole message, then open Home Tracker → Family → Join a family home.
+  <data name="Family_InviteMessage" xml:space="preserve"><value>Join our Use It Before list “{0}”.
+Copy this whole message, then open Use It Before → Family → Join a family home.
 
 {1}
 
@@ -210,7 +210,7 @@ Only share this with family: anyone with it can see and change the list.</value>
   <data name="Family_JoinByPaste" xml:space="preserve"><value>Paste the invite</value></data>
   <data name="Family_PasteHint" xml:space="preserve"><value>Paste the invite message here.</value></data>
   <data name="Family_NoQr" xml:space="preserve"><value>No invite QR code found in the photo. Try again with the code filling most of the photo.</value></data>
-  <data name="Family_BadInvite" xml:space="preserve"><value>That is not a Home Tracker invite. Copy the whole message and try again.</value></data>
+  <data name="Family_BadInvite" xml:space="preserve"><value>That is not a Use It Before invite. Copy the whole message and try again.</value></data>
   <data name="Family_JoinConfirm" xml:space="preserve"><value>Join “{0}”? Its list will appear on this phone and your changes will be shared with that family.</value></data>
   <data name="Family_JoinButton" xml:space="preserve"><value>Join</value></data>
   <data name="Family_JoinedTitle" xml:space="preserve"><value>Joined</value></data>
