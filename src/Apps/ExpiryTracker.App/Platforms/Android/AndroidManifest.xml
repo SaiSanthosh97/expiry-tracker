@@ -14,6 +14,8 @@
 
 	<!-- Expiry reminders. -->
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+	<!-- Medicine doses ring on the minute ("Alarms &amp; reminders"); the user allows it in Android settings. -->
+	<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 	<!-- Restore the daily reminder after the phone restarts. -->
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<!-- Lets the app ask (with a system Allow/Deny dialog) to be excluded from battery saving so reminders aren't blocked. -->

@@ -8,8 +8,22 @@
     Title="{x:Static s:AppResources.AppName}"
     FlyoutBehavior="Disabled">
 
-    <ShellContent
-        ContentTemplate="{DataTemplate views:HomePage}"
-        Route="home" />
+    <!-- Two tabs at the bottom: expiry list and medicines. -->
+    <TabBar>
+        <ShellContent Title="{x:Static s:AppResources.Tab_Expiry}"
+                      ContentTemplate="{DataTemplate views:HomePage}"
+                      Route="home">
+            <ShellContent.Icon>
+                <FontImageSource Glyph="🗓" Size="22" />
+            </ShellContent.Icon>
+        </ShellContent>
+        <ShellContent Title="{x:Static s:AppResources.Tab_Medicines}"
+                      ContentTemplate="{DataTemplate views:MedicinesPage}"
+                      Route="medicines">
+            <ShellContent.Icon>
+                <FontImageSource Glyph="💊" Size="22" />
+            </ShellContent.Icon>
+        </ShellContent>
+    </TabBar>
 
 </Shell>

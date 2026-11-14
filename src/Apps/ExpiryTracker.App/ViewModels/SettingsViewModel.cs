@@ -24,6 +24,10 @@ public sealed partial class SettingsViewModel(
     [ObservableProperty]
     public partial bool BatteryOk { get; set; }
 
+    /// <summary>Medicine alarms may ring on the minute ("Alarms &amp; reminders").</summary>
+    [ObservableProperty]
+    public partial bool OnTimeOk { get; set; }
+
     public string VersionText => string.Format(AppResources.Settings_Version, AppInfo.Current.VersionString);
 
     /// <summary>Re-reads permission state (call on appearing and when returning from Android settings).</summary>
@@ -31,6 +35,7 @@ public sealed partial class SettingsViewModel(
     {
         NotificationsOk = health.NotificationsEnabled;
         BatteryOk = health.BatteryUnrestricted;
+        OnTimeOk = HomeTracker.Device.Reminders.TimedReminders.CanRingOnTime;
     }
 
     partial void OnReminderTimeChanged(TimeSpan value)
@@ -53,6 +58,15 @@ public sealed partial class SettingsViewModel(
 
     [RelayCommand]
     private void FixBattery() => health.RequestBatteryUnrestricted();
+
+    [RelayCommand]
+    private void FixOnTime()
+    {
+        if (Platform.CurrentActivity is { } activity)
+        {
+            HomeTracker.Device.Reminders.TimedReminders.OpenOnTimeSettings(activity);
+        }
+    }
 
     [RelayCommand]
     private void OpenAppSettings() => health.OpenAppSettings();

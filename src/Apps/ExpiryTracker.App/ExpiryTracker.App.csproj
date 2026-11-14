@@ -31,8 +31,8 @@
 		<!-- Versions -->
 		<!-- ApplicationDisplayVersion must match the GitHub release tag (v0.1.0) for update checks.
 		     ApplicationVersion must go up by one with every release. -->
-		<ApplicationDisplayVersion>0.6.1</ApplicationDisplayVersion>
-		<ApplicationVersion>9</ApplicationVersion>
+		<ApplicationDisplayVersion>0.7.0</ApplicationDisplayVersion>
+		<ApplicationVersion>10</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
@@ -89,6 +89,7 @@
 	  <ProjectReference Include="..\..\Components\Core.Sync\Core.Sync.csproj" />
 	  <ProjectReference Include="..\..\Components\Core.Relay\Core.Relay.csproj" />
 	  <ProjectReference Include="..\..\Components\Device.BackgroundWork\Device.BackgroundWork.csproj" />
+	  <ProjectReference Include="..\..\Components\Core.Medicines\Core.Medicines.csproj" />
 	</ItemGroup>
 
 </Project>

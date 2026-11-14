@@ -7,7 +7,7 @@ namespace ExpiryTracker.App.Services;
 /// The homes this phone belongs to, which one is shown, and this phone's identity. There is always at least
 /// one home: a phone that never shared or joined anything has a private "My home".
 /// </summary>
-public sealed class HomeService(IHomeRepository repository, ItemService items, Clock clock)
+public sealed class HomeService(IHomeRepository repository, ItemService items, HomeTracker.Core.Medicines.IMedicineRepository medicines, Clock clock)
 {
     private const string CurrentKey = "home.current";
     private const string DeviceIdKey = "device.id";
@@ -185,6 +185,7 @@ public sealed class HomeService(IHomeRepository repository, ItemService items, C
     {
         await repository.DeleteHomeAsync(home.Id);
         await items.PurgeHomeAsync(home.Id);
+        await medicines.PurgeHomeAsync(home.Id);
         Preferences.Default.Remove(RemindKeyPrefix + home.Id);
         if (Preferences.Default.Get<string?>(CurrentKey, null) == home.Id)
         {

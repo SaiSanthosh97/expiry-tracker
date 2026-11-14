@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\Core.Items\Core.Items.csproj" />
     <ProjectReference Include="..\Core.Households\Core.Households.csproj" />
+    <ProjectReference Include="..\Core.Medicines\Core.Medicines.csproj" />
   </ItemGroup>
 
   <ItemGroup>

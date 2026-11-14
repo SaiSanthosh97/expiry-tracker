@@ -22,10 +22,11 @@ Product requirements: [`# Medicine Tracking & Adherence Platform.md`](%23%20Medi
 | [`Core.Items`](src/Components/Core.Items) | Tracked items, actions (opened, used up, thrown, undo, snooze), home-screen and reminder lists, export/import file format |
 | [`Storage.Sqlite`](src/Components/Storage.Sqlite) | Stores items in a local SQLite database |
 | [`Core.AppUpdater`](src/Components/Core.AppUpdater) | Checks a GitHub repository's latest release for a newer installer and downloads it, verified against GitHub's published SHA-256 |
-| [`Device.Reminders`](src/Components/Device.Reminders) | Android daily reminder: schedule, grouped notification with action buttons, restore after restart, battery-saver checks |
+| [`Device.Reminders`](src/Components/Device.Reminders) | Android daily reminder (grouped notification with action buttons, restore after restart, battery-saver checks) and an on-time alarm with button notifications (medicine doses) |
 | [`Core.LabelCapture`](src/Components/Core.LabelCapture) | Reads a pack photo: product barcode (with check-digit validation), a suggested product name (the largest text) and printed dates, through `IBarcodeReader` / `ITextReader` |
 | [`Core.ProductCatalog`](src/Components/Core.ProductCatalog) | Product lookup by barcode from several sources in order (e.g. household history, then Open Food Facts) |
 | [`Device.Vision`](src/Components/Device.Vision) | Android implementations of `IBarcodeReader` and `ITextReader` using Google ML Kit, on the phone; `PhotoShrinker` saves small, upright copies of photos |
+| [`Core.Medicines`](src/Components/Core.Medicines) | Medicine schedules (daily, every N days, weekdays, when needed), dose rules (remind at +10/+30 min, missed after 60, "Later"), stock and refill warnings |
 | [`Core.Households`](src/Components/Core.Households) | Homes shared between phones, invite codes (QR / text), family phones and "hasn't checked in" logic |
 | [`Core.Sync`](src/Components/Core.Sync) | End-to-end encryption (AES-256-GCM, `SealedBox`), compressed sync messages, splitting lists into relay-sized messages |
 | [`Core.Relay`](src/Components/Core.Relay) | Publish and fetch messages through an [ntfy](https://ntfy.sh) server (public or self-hosted) |

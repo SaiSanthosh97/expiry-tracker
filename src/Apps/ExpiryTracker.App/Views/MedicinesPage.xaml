@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.MedicinesPage"
+             x:DataType="vm:MedicinesViewModel"
+             Title="{x:Static s:AppResources.Meds_Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{x:Static s:AppResources.Home_Refresh}" Command="{Binding RefreshCommand}" />
+        <ToolbarItem Text="{x:Static s:AppResources.Home_Family}" Command="{Binding HomesCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Homes -->
+        <CollectionView Grid.Row="0" ItemsSource="{Binding HomeChips}" IsVisible="{Binding HasManyHomes}"
+                        ItemsLayout="HorizontalList" HorizontalScrollBarVisibility="Never" Margin="16,12,16,0" HeightRequest="64">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:HomeChip">
+                    <Border Style="{StaticResource Chip}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MedicinesViewModel}}, Path=SelectHomeCommand, x:DataType=vm:MedicinesViewModel}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Label Text="{Binding Label}" FontSize="18" VerticalOptions="Center" FontFamily="OpenSansSemibold">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="TextColor" Value="{StaticResource OnPrimary}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <RefreshView Grid.Row="1" Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}" RefreshColor="{StaticResource Primary}">
+            <ScrollView>
+                <VerticalStackLayout Padding="16,8,16,24" Spacing="10">
+
+                    <!-- Without notifications nothing can ring -->
+                    <Border Style="{StaticResource Card}" Padding="14" IsVisible="{Binding NeedsNotifications}" Stroke="{StaticResource Expired}">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Label Text="{x:Static s:AppResources.Meds_NotificationsOff}" VerticalOptions="Center" TextColor="{StaticResource Expired}" />
+                            <Button Grid.Column="1" Text="{x:Static s:AppResources.Settings_Fix}" Command="{Binding FixNotificationsCommand}" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Alarms need "Alarms & reminders" to ring on the minute -->
+                    <Border Style="{StaticResource Card}" Padding="14" IsVisible="{Binding NeedsOnTimeAlarms}">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Label Text="{x:Static s:AppResources.Meds_OnTimeWarning}" VerticalOptions="Center" />
+                            <Button Grid.Column="1" Text="{x:Static s:AppResources.Settings_Fix}" Command="{Binding FixOnTimeAlarmsCommand}" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Nothing yet -->
+                    <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="8,32" Spacing="12">
+                        <Label Text="{x:Static s:AppResources.Meds_Empty}" Style="{StaticResource Heading}" HorizontalTextAlignment="Center" />
+                        <Label Text="{x:Static s:AppResources.Meds_EmptyHint}" Style="{StaticResource Subtle}" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Today's doses -->
+                    <VerticalStackLayout IsVisible="{Binding HasToday}" Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="{x:Static s:AppResources.Meds_Today}" Style="{StaticResource SectionLabel}" FontSize="22" />
+                            <Label Grid.Column="1" Text="{Binding Summary}" Style="{StaticResource Subtle}" VerticalOptions="End" />
+                        </Grid>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Today}" Spacing="8">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:DoseRow">
+                                    <Border Style="{StaticResource Card}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MedicinesViewModel}}, Path=MarkCommand, x:DataType=vm:MedicinesViewModel}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="10,Auto,*" >
+                                            <BoxView Grid.Column="0" Color="{Binding StateColor}" />
+                                            <Label Grid.Column="1" Text="{Binding Time}" FontFamily="OpenSansSemibold" FontSize="20" Margin="14,0,4,0"
+                                                   VerticalOptions="Center" WidthRequest="96" />
+                                            <VerticalStackLayout Grid.Column="2" Padding="6,12,14,12" Spacing="2">
+                                                <Label Text="{Binding Title}" FontFamily="OpenSansSemibold" FontSize="19" />
+                                                <Label Text="{Binding Detail}" Style="{StaticResource Subtle}" />
+                                                <Label Text="{Binding StateText}" TextColor="{Binding StateColor}" FontFamily="OpenSansSemibold" FontSize="17" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- When needed -->
+                    <VerticalStackLayout IsVisible="{Binding HasWhenNeeded}" Spacing="8">
+                        <Label Text="{x:Static s:AppResources.Meds_WhenNeeded}" Style="{StaticResource SectionLabel}" FontSize="22" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding WhenNeeded}" Spacing="8">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MedicineRow">
+                                    <Border Style="{StaticResource Card}" Padding="14,10">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                                <Label Text="{Binding Title}" FontFamily="OpenSansSemibold" FontSize="19" />
+                                                <Label Text="{Binding StockText}" TextColor="{Binding StockColor}" IsVisible="{Binding HasStock}" />
+                                            </VerticalStackLayout>
+                                            <Button Grid.Column="1" Text="{x:Static s:AppResources.Meds_TakeNow}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MedicinesViewModel}}, Path=TakeNowCommand, x:DataType=vm:MedicinesViewModel}"
+                                                    CommandParameter="{Binding .}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- All medicines -->
+                    <Label Text="{x:Static s:AppResources.Meds_All}" Style="{StaticResource SectionLabel}" FontSize="22" IsVisible="{Binding HasToday}" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding All}" Spacing="8">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:MedicineRow">
+                                <Border Style="{StaticResource Card}" Padding="14,10">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MedicinesViewModel}}, Path=OpenCommand, x:DataType=vm:MedicinesViewModel}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding Title}" FontFamily="OpenSansSemibold" FontSize="19" />
+                                        <Label Text="{Binding Detail}" Style="{StaticResource Subtle}" />
+                                        <Label Text="{Binding StockText}" TextColor="{Binding StockColor}" IsVisible="{Binding HasStock}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+
+        <Button Grid.Row="2" Text="{x:Static s:AppResources.Meds_Add}" Command="{Binding AddCommand}" FontSize="24" HeightRequest="68" Margin="16,8,16,16" />
+    </Grid>
+</ContentPage>

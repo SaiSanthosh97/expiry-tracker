@@ -15,6 +15,11 @@
         <Setter Property="Shell.ForegroundColor" Value="{StaticResource OnPrimary}" />
         <Setter Property="Shell.TitleColor" Value="{StaticResource OnPrimary}" />
         <Setter Property="Shell.NavBarHasShadow" Value="False" />
+        <!-- Bottom tabs: white for the open tab, light teal (still readable) for the other. -->
+        <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource Primary}" />
+        <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource OnPrimary}" />
+        <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource OnPrimary}" />
+        <Setter Property="Shell.TabBarUnselectedColor" Value="#B9E4E4" />
     </Style>
 
     <Style TargetType="Label">

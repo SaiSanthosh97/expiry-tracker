@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.MedicineEditPage"
+             x:DataType="vm:MedicineEditViewModel"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,8,16,24" Spacing="6">
+
+                <!-- Which home (new medicine, more than one home) -->
+                <VerticalStackLayout IsVisible="{Binding ShowHomePicker}">
+                    <Label Text="{x:Static s:AppResources.Add_WhichHome}" Style="{StaticResource SectionLabel}" />
+                    <Picker ItemsSource="{Binding HomeNames}" SelectedIndex="{Binding HomeIndex}" FontSize="20" />
+                </VerticalStackLayout>
+
+                <!-- Who -->
+                <Label Text="{x:Static s:AppResources.Med_Who}" Style="{StaticResource SectionLabel}" />
+                <Entry Text="{Binding Person}" Placeholder="{x:Static s:AppResources.Med_WhoHint}" ReturnType="Next" />
+                <FlexLayout BindableLayout.ItemsSource="{Binding People}" Wrap="Wrap">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Border Style="{StaticResource Chip}" Margin="0,4,8,0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MedicineEditViewModel}}, Path=PickPersonCommand, x:DataType=vm:MedicineEditViewModel}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Label Text="{Binding .}" FontSize="17" />
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+
+                <!-- What -->
+                <Label Text="{x:Static s:AppResources.Med_Name}" Style="{StaticResource SectionLabel}" />
+                <Entry Text="{Binding Name}" Placeholder="{x:Static s:AppResources.Med_NameHint}" ReturnType="Done" />
+
+                <!-- How often -->
+                <Label Text="{x:Static s:AppResources.Med_HowOften}" Style="{StaticResource SectionLabel}" />
+                <VerticalStackLayout RadioButtonGroup.GroupName="often">
+                    <RadioButton Content="{x:Static s:AppResources.Med_EveryDay}" IsChecked="{Binding IsDaily}" />
+                    <RadioButton Content="{x:Static s:AppResources.Med_EveryOtherDay}" IsChecked="{Binding IsAlternate}" />
+                    <RadioButton Content="{x:Static s:AppResources.Med_SomeDays}" IsChecked="{Binding IsSomeDays}" />
+                    <RadioButton Content="{x:Static s:AppResources.Med_WhenNeeded}" IsChecked="{Binding IsAsNeeded}" />
+                </VerticalStackLayout>
+
+                <FlexLayout BindableLayout.ItemsSource="{Binding Days}" Wrap="Wrap" IsVisible="{Binding IsSomeDays}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DayChip">
+                            <Border Style="{StaticResource Chip}" Margin="0,4,8,0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MedicineEditViewModel}}, Path=ToggleDayCommand, x:DataType=vm:MedicineEditViewModel}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                        <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Label Text="{Binding Label}" FontSize="17">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource OnPrimary}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+
+                <!-- Times -->
+                <VerticalStackLayout IsVisible="{Binding HasTimes}" Spacing="6">
+                    <Label Text="{x:Static s:AppResources.Med_Times}" Style="{StaticResource SectionLabel}" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Times}" Spacing="6">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DoseTime">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <TimePicker Time="{Binding Time}" FontSize="22" />
+                                    <Button Grid.Column="1" Text="✕" Style="{StaticResource OutlineButton}" WidthRequest="60"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MedicineEditViewModel}}, Path=RemoveTimeCommand, x:DataType=vm:MedicineEditViewModel}"
+                                            CommandParameter="{Binding .}" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <Button Text="{x:Static s:AppResources.Med_AddTime}" Command="{Binding AddTimeCommand}" Style="{StaticResource OutlineButton}" />
+                </VerticalStackLayout>
+
+                <!-- How much -->
+                <Label Text="{x:Static s:AppResources.Med_HowMuch}" Style="{StaticResource SectionLabel}" />
+                <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="12">
+                    <Button Grid.Column="0" Text="−" Style="{StaticResource StepButton}" Command="{Binding ChangeAmountCommand}" CommandParameter="-0.5" />
+                    <Label Grid.Column="1" Text="{Binding AmountText}" Style="{StaticResource Heading}" VerticalOptions="Center" MinimumWidthRequest="40" HorizontalTextAlignment="Center" />
+                    <Button Grid.Column="2" Text="+" Style="{StaticResource StepButton}" Command="{Binding ChangeAmountCommand}" CommandParameter="0.5" />
+                    <Picker Grid.Column="3" ItemsSource="{Binding UnitNames}" SelectedIndex="{Binding UnitIndex}" FontSize="20" VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Stock -->
+                <Label Text="{x:Static s:AppResources.Med_Stock}" Style="{StaticResource SectionLabel}" />
+                <Entry Text="{Binding StockText}" Keyboard="Numeric" Placeholder="{x:Static s:AppResources.Med_StockHint}" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" IsVisible="{Binding IsEditing}">
+                    <Label Text="{Binding StockSummary}" Style="{StaticResource Subtle}" VerticalOptions="Center" />
+                    <Button Grid.Column="1" Text="{x:Static s:AppResources.Med_BoughtMore}" Command="{Binding BoughtMoreCommand}" Style="{StaticResource OutlineButton}" />
+                </Grid>
+
+                <!-- Which phone rings -->
+                <Label Text="{x:Static s:AppResources.Med_WhichPhone}" Style="{StaticResource SectionLabel}" />
+                <Picker ItemsSource="{Binding PhoneNames}" SelectedIndex="{Binding PhoneIndex}" FontSize="20" />
+                <Label Text="{x:Static s:AppResources.Med_WhichPhoneHint}" Style="{StaticResource Subtle}" />
+
+                <!-- Notes -->
+                <Label Text="{x:Static s:AppResources.Med_Notes}" Style="{StaticResource SectionLabel}" />
+                <Entry Text="{Binding Notes}" Placeholder="{x:Static s:AppResources.Med_NotesHint}" />
+
+                <Button Text="{x:Static s:AppResources.Med_Delete}" Command="{Binding DeleteCommand}" IsVisible="{Binding IsEditing}"
+                        Style="{StaticResource OutlineButton}" TextColor="{StaticResource Expired}" BorderColor="{StaticResource Expired}" Margin="0,16,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Button Grid.Row="1" Text="{x:Static s:AppResources.Add_Save}" Command="{Binding SaveCommand}" FontSize="24" HeightRequest="68" Margin="16,8,16,16" />
+    </Grid>
+</ContentPage>

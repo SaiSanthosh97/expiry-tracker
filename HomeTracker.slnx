@@ -9,6 +9,7 @@
     <Project Path="src/Components/Core.Households/Core.Households.csproj" />
     <Project Path="src/Components/Core.Items/Core.Items.csproj" />
     <Project Path="src/Components/Core.LabelCapture/Core.LabelCapture.csproj" />
+    <Project Path="src/Components/Core.Medicines/Core.Medicines.csproj" />
     <Project Path="src/Components/Core.ProductCatalog/Core.ProductCatalog.csproj" />
     <Project Path="src/Components/Core.Relay/Core.Relay.csproj" />
     <Project Path="src/Components/Core.ShelfLife/Core.ShelfLife.csproj" />
@@ -26,6 +27,7 @@
     <Project Path="tests/Core.Households.Tests/Core.Households.Tests.csproj" />
     <Project Path="tests/Core.Items.Tests/Core.Items.Tests.csproj" />
     <Project Path="tests/Core.LabelCapture.Tests/Core.LabelCapture.Tests.csproj" />
+    <Project Path="tests/Core.Medicines.Tests/Core.Medicines.Tests.csproj" />
     <Project Path="tests/Core.ProductCatalog.Tests/Core.ProductCatalog.Tests.csproj" />
     <Project Path="tests/Core.Relay.Tests/Core.Relay.Tests.csproj" />
     <Project Path="tests/Core.ShelfLife.Tests/Core.ShelfLife.Tests.csproj" />

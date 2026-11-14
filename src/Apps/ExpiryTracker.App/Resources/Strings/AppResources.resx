@@ -240,4 +240,90 @@ Only share this with family: anyone with it can see and change the list.</value>
 Also works without backup: on the new phone, Homes → Join a home, and take a photo of a home&apos;s QR code on another phone (open the home here to see it). The list and photos arrive within a few minutes.</value></data>
   <data name="Item_PhotoComing" xml:space="preserve"><value>📷 The photo is on its way from the family phone that took it. Tap Refresh on the main screen to ask for it now.</value></data>
   <data name="Item_PhotoComingFrom" xml:space="preserve"><value>📷 The photo is on its way from {0}&apos;s phone. It arrives when that phone is online – tap Refresh on the main screen to ask for it now.</value></data>
+  <data name="Tab_Expiry" xml:space="preserve"><value>Expiry</value></data>
+  <data name="Tab_Medicines" xml:space="preserve"><value>Medicines</value></data>
+  <data name="Meds_Title" xml:space="preserve"><value>Medicines</value></data>
+  <data name="Meds_Today" xml:space="preserve"><value>Today</value></data>
+  <data name="Meds_Summary" xml:space="preserve"><value>{0} of {1} taken</value></data>
+  <data name="Meds_WhenNeeded" xml:space="preserve"><value>Only when needed</value></data>
+  <data name="Meds_All" xml:space="preserve"><value>All medicines</value></data>
+  <data name="Meds_Add" xml:space="preserve"><value>+  Add medicine</value></data>
+  <data name="Meds_Empty" xml:space="preserve"><value>No medicines yet.</value></data>
+  <data name="Meds_EmptyHint" xml:space="preserve"><value>Add a medicine to get reminders at the right time. If a dose is missed, the family is told.</value></data>
+  <data name="Meds_TakeNow" xml:space="preserve"><value>Take now</value></data>
+  <data name="Meds_TakeNowConfirm" xml:space="preserve"><value>Record {0} taken now?</value></data>
+  <data name="Meds_MarkTitle" xml:space="preserve"><value>{0} · {1} at {2}</value></data>
+  <data name="Meds_OnTimeWarning" xml:space="preserve"><value>To ring on the minute, allow “Alarms &amp; reminders” for Use It Before. Without it, reminders can be a few minutes late.</value></data>
+  <data name="Med_AddTitle" xml:space="preserve"><value>Add medicine</value></data>
+  <data name="Med_EditTitle" xml:space="preserve"><value>Medicine</value></data>
+  <data name="Med_Who" xml:space="preserve"><value>Who takes it?</value></data>
+  <data name="Med_WhoHint" xml:space="preserve"><value>e.g. Appa, Amma</value></data>
+  <data name="Med_Name" xml:space="preserve"><value>Medicine</value></data>
+  <data name="Med_NameHint" xml:space="preserve"><value>Name and strength, e.g. Amlodipine 5 mg</value></data>
+  <data name="Med_HowOften" xml:space="preserve"><value>How often?</value></data>
+  <data name="Med_EveryDay" xml:space="preserve"><value>Every day</value></data>
+  <data name="Med_EveryOtherDay" xml:space="preserve"><value>Every other day</value></data>
+  <data name="Med_SomeDays" xml:space="preserve"><value>Some days of the week</value></data>
+  <data name="Med_WhenNeeded" xml:space="preserve"><value>Only when needed</value></data>
+  <data name="Med_Times" xml:space="preserve"><value>At what time?</value></data>
+  <data name="Med_AddTime" xml:space="preserve"><value>+ Add a time</value></data>
+  <data name="Med_HowMuch" xml:space="preserve"><value>How much each time?</value></data>
+  <data name="Med_Stock" xml:space="preserve"><value>How many at home? (optional)</value></data>
+  <data name="Med_StockHint" xml:space="preserve"><value>e.g. 30 – for a warning before it runs out</value></data>
+  <data name="Med_BoughtMore" xml:space="preserve"><value>Bought more</value></data>
+  <data name="Med_BoughtMoreHint" xml:space="preserve"><value>How many {0} did you buy?</value></data>
+  <data name="Med_WhichPhone" xml:space="preserve"><value>Which phone reminds?</value></data>
+  <data name="Med_WhichPhoneHint" xml:space="preserve"><value>Usually the phone of the person who takes it. Everyone else in the home sees if a dose is taken or missed.</value></data>
+  <data name="Med_ThisPhone" xml:space="preserve"><value>This phone ({0})</value></data>
+  <data name="Med_Notes" xml:space="preserve"><value>Notes (optional)</value></data>
+  <data name="Med_NotesHint" xml:space="preserve"><value>e.g. after food</value></data>
+  <data name="Med_Delete" xml:space="preserve"><value>Delete medicine</value></data>
+  <data name="Med_DeleteTitle" xml:space="preserve"><value>Delete {0}?</value></data>
+  <data name="Med_DeleteText" xml:space="preserve"><value>Reminders stop on every phone in this home.</value></data>
+  <data name="Med_NeedNames" xml:space="preserve"><value>Please fill in who takes it and the medicine name.</value></data>
+  <data name="Med_NeedDays" xml:space="preserve"><value>Please choose at least one day.</value></data>
+  <data name="Med_BadStock" xml:space="preserve"><value>Please type a number for how many are at home, or leave it empty.</value></data>
+  <data name="Schedule_Daily" xml:space="preserve"><value>Every day at {0}</value></data>
+  <data name="Schedule_AlternateDays" xml:space="preserve"><value>Every other day at {0}</value></data>
+  <data name="Schedule_EveryNDays" xml:space="preserve"><value>Every {0} days at {1}</value></data>
+  <data name="Schedule_Weekdays" xml:space="preserve"><value>{0} at {1}</value></data>
+  <data name="Schedule_AsNeeded" xml:space="preserve"><value>Only when needed</value></data>
+  <data name="Stock_Left" xml:space="preserve"><value>{0} {1} left</value></data>
+  <data name="Stock_Days" xml:space="preserve"><value>about {0} days</value></data>
+  <data name="Refill_Title" xml:space="preserve"><value>Buy more {0}</value></data>
+  <data name="Refill_FamilyTitle" xml:space="preserve"><value>{0}: buy more {1}</value></data>
+  <data name="Refill_Text" xml:space="preserve"><value>Only {0}. Buy more soon.</value></data>
+  <data name="DoseState_Taken" xml:space="preserve"><value>✓ Taken · by {0}</value></data>
+  <data name="DoseState_Skipped" xml:space="preserve"><value>Skipped</value></data>
+  <data name="DoseState_Missed" xml:space="preserve"><value>Missed</value></data>
+  <data name="DoseState_Later" xml:space="preserve"><value>Reminder again soon</value></data>
+  <data name="DoseState_Due" xml:space="preserve"><value>Take now</value></data>
+  <data name="DoseState_Upcoming" xml:space="preserve"><value>Later today</value></data>
+  <data name="Dose_Channel" xml:space="preserve"><value>Medicine doses</value></data>
+  <data name="Dose_ChannelDescription" xml:space="preserve"><value>Rings at the time of each dose, with Taken / Later / Skip</value></data>
+  <data name="Dose_Title" xml:space="preserve"><value>💊 {0}: {1}</value></data>
+  <data name="Dose_Text" xml:space="preserve"><value>Take {0} now (due {1}).</value></data>
+  <data name="Dose_Taken" xml:space="preserve"><value>Taken</value></data>
+  <data name="Dose_Later" xml:space="preserve"><value>Later</value></data>
+  <data name="Dose_Skip" xml:space="preserve"><value>Skip</value></data>
+  <data name="Dose_MissedTitle" xml:space="preserve"><value>Missed: {0} – {1}</value></data>
+  <data name="Dose_MissedText" xml:space="preserve"><value>The {0} dose was not marked as taken. Your family has been told.</value></data>
+  <data name="Family_MissedTitle" xml:space="preserve"><value>{0} missed a dose</value></data>
+  <data name="Family_MissedText" xml:space="preserve"><value>{0} at {1} was not taken ({2}).</value></data>
+  <data name="Settings_OnTime" xml:space="preserve"><value>Medicine alarms on time</value></data>
+  <data name="Unit_tablet" xml:space="preserve"><value>tablet</value></data>
+  <data name="Unit_tablet_Many" xml:space="preserve"><value>tablets</value></data>
+  <data name="Unit_capsule" xml:space="preserve"><value>capsule</value></data>
+  <data name="Unit_capsule_Many" xml:space="preserve"><value>capsules</value></data>
+  <data name="Unit_ml" xml:space="preserve"><value>ml</value></data>
+  <data name="Unit_ml_Many" xml:space="preserve"><value>ml</value></data>
+  <data name="Unit_drop" xml:space="preserve"><value>drop</value></data>
+  <data name="Unit_drop_Many" xml:space="preserve"><value>drops</value></data>
+  <data name="Unit_puff" xml:space="preserve"><value>puff</value></data>
+  <data name="Unit_puff_Many" xml:space="preserve"><value>puffs</value></data>
+  <data name="Unit_sachet" xml:space="preserve"><value>sachet</value></data>
+  <data name="Unit_sachet_Many" xml:space="preserve"><value>sachets</value></data>
+  <data name="Unit_injection" xml:space="preserve"><value>injection</value></data>
+  <data name="Unit_injection_Many" xml:space="preserve"><value>injections</value></data>
+  <data name="Meds_NotificationsOff" xml:space="preserve"><value>Notifications are off, so medicine reminders can&apos;t ring. Tap Fix and allow notifications.</value></data>
 </root>

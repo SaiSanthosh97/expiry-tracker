@@ -86,6 +86,9 @@ public sealed class ReminderActionReceiver : BroadcastReceiver
 [IntentFilter([Intent.ActionBootCompleted, Intent.ActionMyPackageReplaced, Intent.ActionTimeChanged, Intent.ActionTimezoneChanged])]
 public sealed class RescheduleReceiver : BroadcastReceiver
 {
+    /// <summary>Also run after a restart, app update or clock change (e.g. to set the next medicine alarm again).</summary>
+    internal static Action? AlsoOnReschedule { get; set; }
+
     public override void OnReceive(Context? context, Intent? intent)
     {
         // Exported only so the system can deliver these protected broadcasts; other apps cannot send them.
@@ -93,6 +96,7 @@ public sealed class RescheduleReceiver : BroadcastReceiver
         {
             Log.Info("HomeTracker", $"Rescheduling daily reminder after {intent.Action}");
             DailyReminders.Schedule();
+            AlsoOnReschedule?.Invoke();
         }
     }
 }

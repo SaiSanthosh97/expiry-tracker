@@ -51,6 +51,21 @@
                 </Grid>
             </Border>
 
+            <Border Style="{StaticResource Card}" Padding="14">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Label Text="{x:Static s:AppResources.Settings_OnTime}" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{x:Static s:AppResources.Settings_Done}" TextColor="{StaticResource Fresh}"
+                           FontFamily="OpenSansSemibold" VerticalOptions="Center" IsVisible="{Binding OnTimeOk}" />
+                    <Button Grid.Column="1" Text="{x:Static s:AppResources.Settings_Fix}" Command="{Binding FixOnTimeCommand}">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding OnTimeOk}" Value="True">
+                                <Setter Property="IsVisible" Value="False" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </Grid>
+            </Border>
+
             <Label Text="{x:Static s:AppResources.Settings_SamsungTip}" Style="{StaticResource Subtle}" />
             <Button Text="{x:Static s:AppResources.Settings_OpenAppSettings}" Command="{Binding OpenAppSettingsCommand}" Style="{StaticResource OutlineButton}" />
             <Button Text="{x:Static s:AppResources.Settings_TestReminder}" Command="{Binding SendTestReminderCommand}" />

@@ -52,8 +52,15 @@ public partial class HomePage : ContentPage
 
             _settings.WelcomeShown = true;
         }
+        else if (!_health.NotificationsEnabled)
+        {
+            // E.g. a new phone restored from a backup: the welcome was already seen on the old phone,
+            // but this phone has never been asked. Android shows nothing if the person said no twice.
+            await _health.RequestNotificationsAsync();
+        }
 
         await _health.ScheduleAndCatchUpAsync();
+        await IPlatformApplication.Current!.Services.GetRequiredService<DoseEngine>().RunAsync();
         HomeTracker.Device.HomeWidget.HomeWidget.Refresh();
         await IPlatformApplication.Current!.Services.GetRequiredService<FamilySyncService>().UpdateBackgroundAsync();
         UpdateService.DeleteDownloads();

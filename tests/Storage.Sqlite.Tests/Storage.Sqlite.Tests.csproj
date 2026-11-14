@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Components\Storage.Sqlite\Storage.Sqlite.csproj" />
+    <ProjectReference Include="..\..\src\Components\Core.Medicines\Core.Medicines.csproj" />
     <ProjectReference Include="..\..\src\Components\Core.Items\Core.Items.csproj" />
     <ProjectReference Include="..\..\src\Components\Core.ShelfLife\Core.ShelfLife.csproj" />
   </ItemGroup>

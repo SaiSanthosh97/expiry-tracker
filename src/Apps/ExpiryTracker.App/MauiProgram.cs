@@ -40,6 +40,7 @@ public static class MauiProgram
 		var databasePath = Path.Combine(FileSystem.AppDataDirectory, "items.db3");
 		services.AddSingleton<IItemRepository>(_ => new SqliteItemRepository(databasePath));
 		services.AddSingleton<IHomeRepository>(_ => new SqliteHomeRepository(databasePath));
+		services.AddSingleton<HomeTracker.Core.Medicines.IMedicineRepository>(_ => new SqliteMedicineRepository(databasePath));
 		services.AddSingleton(_ => new ShelfLifeCatalog());
 		services.AddSingleton<ItemEvaluator>();
 		services.AddSingleton(_ => new HttpClient { Timeout = TimeSpan.FromSeconds(20) });
@@ -70,6 +71,8 @@ public static class MauiProgram
 		services.AddSingleton<PhotoStore>();
 		services.AddSingleton<HomeService>();
 		services.AddSingleton<FamilySyncService>();
+		services.AddSingleton<MedicineService>();
+		services.AddSingleton<DoseEngine>();
 		services.AddSingleton<WidgetSource>();
 
 		// Screens
@@ -86,6 +89,10 @@ public static class MauiProgram
 		services.AddTransient<FamilyPage>();
 		services.AddTransient<HomesViewModel>();
 		services.AddTransient<HomesPage>();
+		services.AddSingleton<MedicinesViewModel>();
+		services.AddSingleton<MedicinesPage>();
+		services.AddTransient<MedicineEditViewModel>();
+		services.AddTransient<MedicineEditPage>();
 
 		var app = builder.Build();
 
@@ -101,6 +108,12 @@ public static class MauiProgram
 				AppResources.Reminder_UsedUp,
 				AppResources.Reminder_Thrown,
 				AppResources.Reminder_Tomorrow));
+
+		// Medicine doses: on-time alarm, Taken / Later / Skip, missed after an hour.
+		var doses = app.Services.GetRequiredService<DoseEngine>();
+		doses.Initialize();
+		// Family sync is created now so it sends medicine changes too.
+		app.Services.GetRequiredService<FamilySyncService>();
 
 		// Family sync in the background (about every 15 minutes, only once a home is shared).
 		BackgroundWork.Initialize(token => app.Services.GetRequiredService<FamilySyncService>().SyncNowAsync(token));

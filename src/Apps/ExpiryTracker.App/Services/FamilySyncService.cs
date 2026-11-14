@@ -2,6 +2,7 @@ using System.Text.Json;
 using ExpiryTracker.App.Resources.Strings;
 using HomeTracker.Core.Households;
 using HomeTracker.Core.Items;
+using HomeTracker.Core.Medicines;
 using HomeTracker.Core.Relay;
 using HomeTracker.Core.Sync;
 using HomeTracker.Device.BackgroundWork;
@@ -22,6 +23,9 @@ public sealed class FamilySyncService
     private const string CheckInKind = "check-in";
     private const string PhotoKind = "photo";
     private const string PhotoRequestKind = "photo-request";
+    private const string MedicinesKind = "medicines";
+    private const string MedOutboxKey = "sync.outbox.meds";
+    private const string DoseOutboxKey = "sync.outbox.doses";
     private static readonly TimeSpan PhotoAskAgainAfter = TimeSpan.FromHours(6);
     private static readonly TimeSpan PhotoResendAtMostEvery = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan StateAskAgainAfter = TimeSpan.FromMinutes(30);
@@ -36,6 +40,7 @@ public sealed class FamilySyncService
 
     private readonly HomeService _homes;
     private readonly ItemService _items;
+    private readonly MedicineService _medicines;
     private readonly HttpClient _http;
     private readonly Clock _clock;
     private readonly SemaphoreSlim _running = new(1, 1);
@@ -43,10 +48,12 @@ public sealed class FamilySyncService
     private CancellationTokenSource? _sendSoon;
     private CancellationTokenSource? _foreground;
 
-    public FamilySyncService(HomeService homes, ItemService items, HttpClient http, Clock clock)
+    public FamilySyncService(HomeService homes, ItemService items, MedicineService medicines, HttpClient http, Clock clock)
     {
         _homes = homes;
         _items = items;
+        _medicines = medicines;
+        _medicines.Changed += OnMedicinesChanged;
         _http = http;
         _clock = clock;
         _items.Changed += OnItemsChanged;
@@ -65,6 +72,8 @@ public sealed class FamilySyncService
     private sealed record PhotoBody(string File);
 
     private sealed record PhotoRequestBody(List<string> Files);
+
+    private sealed record MedicinesBody(List<Medicine> Medicines, List<DoseEvent> Doses);
 
     /// <summary>When this phone last reached the relay for a home, or null.</summary>
     public static DateTimeOffset? LastSync(string homeId) => GetTime("sync.last." + homeId);
@@ -134,6 +143,7 @@ public sealed class FamilySyncService
             }
 
             await DropUnsharedFromOutboxAsync(allHomes);
+            await DropUnsharedMedicinesAsync(allHomes);
 
             if (replacing && allOk)
             {
@@ -226,6 +236,8 @@ public sealed class FamilySyncService
         var incoming = new List<TrackedItem>();
         var photosRequested = new HashSet<string>();
         var photoLinks = new Dictionary<string, Uri>();
+        var incomingMeds = new List<Medicine>();
+        var incomingDoses = new List<DoseEvent>();
 
         foreach (var message in messages)
         {
@@ -254,6 +266,10 @@ public sealed class FamilySyncService
                 case PhotoRequestKind when envelope.BodyAs<PhotoRequestBody>() is { } request:
                     photosRequested.UnionWith(request.Files.Where(PhotoStore.IsValidName));
                     break;
+                case MedicinesKind when envelope.BodyAs<MedicinesBody>() is { } meds:
+                    incomingMeds.AddRange(meds.Medicines.Select(m => m with { HomeId = home.Id }));
+                    incomingDoses.AddRange(meds.Doses.Select(d => d with { HomeId = home.Id }));
+                    break;
             }
         }
 
@@ -261,6 +277,14 @@ public sealed class FamilySyncService
         {
             changed = (await _items.ApplyFromFamilyAsync(incoming)).Count > 0;
             Preferences.Default.Remove("sync.awaiting." + home.Id);
+        }
+
+        if (incomingMeds.Count > 0 || incomingDoses.Count > 0)
+        {
+            var applied = await _medicines.ApplyFromFamilyAsync(incomingMeds, incomingDoses);
+            changed |= applied.Medicines.Count > 0 || applied.Doses.Count > 0;
+            Preferences.Default.Remove("sync.awaiting." + home.Id);
+            await AlertFamilyAsync(home, applied);
         }
 
         changed |= await ReceivePhotosAsync(home, photoLinks, cancellationToken);
@@ -288,6 +312,8 @@ public sealed class FamilySyncService
             .Where(i => (!i.IsClosed && !i.IsDeleted) || i.UpdatedAt > cutoff)
             .ToList();
         await PublishItemsAsync(home, items, cancellationToken);
+        var (meds, doses) = await _medicines.GetForHomeAsync(home.Id);
+        await PublishMedicinesAsync(home, meds, doses, cancellationToken);
         SetTime("sync.statereply." + home.Id, _clock.Now);
 
         // Photos of open items go with the list, so a phone that just joined doesn't have to ask for each.
@@ -311,6 +337,72 @@ public sealed class FamilySyncService
         foreach (var message in messages)
         {
             await relay.PublishAsync(home.Topic!, message, cancellationToken);
+        }
+    }
+
+    private async Task PublishMedicinesAsync(Home home, IReadOnlyList<Medicine> meds, IReadOnlyList<DoseEvent> doses, CancellationToken cancellationToken)
+    {
+        var relay = Relay(home);
+        if (meds.Count > 0)
+        {
+            foreach (var message in SyncCodec.Pack(meds, batch => Encode(home, MedicinesKind, new MedicinesBody([.. batch], [])), NtfyRelay.MaxMessageLength))
+            {
+                await relay.PublishAsync(home.Topic!, message, cancellationToken);
+            }
+        }
+
+        if (doses.Count > 0)
+        {
+            foreach (var message in SyncCodec.Pack(doses, batch => Encode(home, MedicinesKind, new MedicinesBody([], [.. batch])), NtfyRelay.MaxMessageLength))
+            {
+                await relay.PublishAsync(home.Topic!, message, cancellationToken);
+            }
+        }
+    }
+
+    /// <summary>
+    /// On family phones (not the phone that rings for the medicine): a missed dose and a medicine running low
+    /// each give one notification.
+    /// </summary>
+    private async Task AlertFamilyAsync(Home home, MedicinesChangedEventArgs applied)
+    {
+        if (!HomeService.GetRemind(home.Id))
+        {
+            return;
+        }
+
+        var me = _homes.Me.DeviceId;
+        var all = (await _medicines.GetAllAsync(includeDeleted: true)).ToDictionary(m => m.Id);
+        foreach (var dose in applied.Doses.Where(d => d.Status == DoseStatus.Missed))
+        {
+            if (!all.TryGetValue(dose.MedicineId, out var med) || med.ReminderDeviceId == me || med.IsDeleted
+                || Preferences.Default.ContainsKey("family.missed." + dose.Id))
+            {
+                continue;
+            }
+
+            Preferences.Default.Set("family.missed." + dose.Id, true);
+            DailyReminders.ShowMessage(
+                "missed/" + dose.Id,
+                string.Format(AppResources.Family_MissedTitle, med.Person),
+                string.Format(AppResources.Family_MissedText, med.Name, dose.ScheduledAt.ToString("t", System.Globalization.CultureInfo.CurrentCulture), home.Name));
+        }
+
+        foreach (var med in applied.Medicines.Where(m => !m.IsDeleted && m.ReminderDeviceId != me))
+        {
+            var key = "family.refill." + med.Id;
+            if (!DoseStock.NeedsRefill(med))
+            {
+                Preferences.Default.Remove(key);
+            }
+            else if (!Preferences.Default.ContainsKey(key))
+            {
+                Preferences.Default.Set(key, true);
+                DailyReminders.ShowMessage(
+                    "refill/" + med.Id,
+                    string.Format(AppResources.Refill_FamilyTitle, med.Person, med.Name),
+                    MedicineText.Refill(med));
+            }
         }
     }
 
@@ -466,8 +558,94 @@ public sealed class FamilySyncService
             TaskScheduler.Default).Unwrap();
     }
 
+    private void OnMedicinesChanged(object? sender, MedicinesChangedEventArgs e)
+    {
+        if (e.FromSync || (e.Medicines.Count == 0 && e.Doses.Count == 0))
+        {
+            return;
+        }
+
+        lock (_outboxLock)
+        {
+            var meds = ReadSet(MedOutboxKey);
+            meds.UnionWith(e.Medicines.Select(m => m.Id));
+            Preferences.Default.Set(MedOutboxKey, JsonSerializer.Serialize(meds));
+            var doses = ReadSet(DoseOutboxKey);
+            doses.UnionWith(e.Doses.Select(d => d.Id));
+            Preferences.Default.Set(DoseOutboxKey, JsonSerializer.Serialize(doses));
+        }
+
+        _sendSoon?.Cancel();
+        var cts = _sendSoon = new CancellationTokenSource();
+        _ = Task.Delay(SendDelay, cts.Token).ContinueWith(
+            _ => SyncNowAsync(),
+            cts.Token,
+            TaskContinuationOptions.OnlyOnRanToCompletion,
+            TaskScheduler.Default).Unwrap();
+    }
+
+    private async Task FlushMedicinesAsync(Home home, CancellationToken cancellationToken)
+    {
+        HashSet<string> medIds, doseIds;
+        lock (_outboxLock)
+        {
+            medIds = ReadSet(MedOutboxKey);
+            doseIds = ReadSet(DoseOutboxKey);
+        }
+
+        if (medIds.Count == 0 && doseIds.Count == 0)
+        {
+            return;
+        }
+
+        var meds = (await _medicines.GetAllAsync(includeDeleted: true)).Where(m => m.HomeId == home.Id && medIds.Contains(m.Id)).ToList();
+        var doses = (await _medicines.GetRecentEventsAsync()).Where(d => d.HomeId == home.Id && doseIds.Contains(d.Id)).ToList();
+        await PublishMedicinesAsync(home, meds, doses, cancellationToken);
+
+        lock (_outboxLock)
+        {
+            var m = ReadSet(MedOutboxKey);
+            m.ExceptWith(meds.Select(x => x.Id));
+            Preferences.Default.Set(MedOutboxKey, JsonSerializer.Serialize(m));
+            var d = ReadSet(DoseOutboxKey);
+            d.ExceptWith(doses.Select(x => x.Id));
+            Preferences.Default.Set(DoseOutboxKey, JsonSerializer.Serialize(d));
+        }
+    }
+
+    /// <summary>Medicine changes in homes that aren't shared, or no longer known, have nowhere to go.</summary>
+    private async Task DropUnsharedMedicinesAsync(IReadOnlyList<Home> allHomes)
+    {
+        var shared = allHomes.Where(h => h.IsShared).Select(h => h.Id).ToHashSet();
+        var meds = (await _medicines.GetAllAsync(includeDeleted: true)).Where(m => shared.Contains(m.HomeId)).Select(m => m.Id).ToHashSet();
+        var doses = (await _medicines.GetRecentEventsAsync()).Where(d => shared.Contains(d.HomeId)).Select(d => d.Id).ToHashSet();
+        lock (_outboxLock)
+        {
+            var m = ReadSet(MedOutboxKey);
+            m.IntersectWith(meds);
+            Preferences.Default.Set(MedOutboxKey, JsonSerializer.Serialize(m));
+            var d = ReadSet(DoseOutboxKey);
+            d.IntersectWith(doses);
+            Preferences.Default.Set(DoseOutboxKey, JsonSerializer.Serialize(d));
+        }
+    }
+
+    private static HashSet<string> ReadSet(string key)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<HashSet<string>>(Preferences.Default.Get(key, "[]")) ?? [];
+        }
+        catch (JsonException)
+        {
+            return [];
+        }
+    }
+
     private async Task FlushOutboxAsync(Home home, CancellationToken cancellationToken)
     {
+        await FlushMedicinesAsync(home, cancellationToken);
+
         HashSet<string> pending;
         lock (_outboxLock)
         {
