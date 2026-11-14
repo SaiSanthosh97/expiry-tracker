@@ -15,12 +15,13 @@ public sealed class DailyReminderReceiver : BroadcastReceiver
             return;
         }
 
+        var again = intent?.GetBooleanExtra(DailyReminders.ExtraAgain, false) == true;
         var pending = GoAsync();
         _ = Task.Run(async () =>
         {
             try
             {
-                await RunAsync(context);
+                await RunAsync(context, again);
             }
             finally
             {
@@ -30,11 +31,11 @@ public sealed class DailyReminderReceiver : BroadcastReceiver
         });
     }
 
-    internal static async Task RunAsync(Context context)
+    internal static async Task RunAsync(Context context, bool again)
     {
         try
         {
-            var content = await DailyReminders.Source.BuildAsync(DateOnly.FromDateTime(DateTime.Now));
+            var content = await DailyReminders.Source.BuildAsync(DateOnly.FromDateTime(DateTime.Now), again);
             if (content is not null)
             {
                 DailyReminders.Post(context, content);
@@ -54,7 +55,7 @@ public sealed class ReminderActionReceiver : BroadcastReceiver
     public override void OnReceive(Context? context, Intent? intent)
     {
         var itemId = intent?.GetStringExtra(DailyReminders.ExtraItemId);
-        if (context is null || itemId is null || !Enum.TryParse<ReminderAction>(intent?.GetStringExtra(DailyReminders.ExtraAction), out var action))
+        if (context is null || !Enum.TryParse<ReminderAction>(intent?.GetStringExtra(DailyReminders.ExtraAction), out var action))
         {
             return;
         }

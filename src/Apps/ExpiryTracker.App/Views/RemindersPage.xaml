@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ExpiryTracker.App.ViewModels"
+             xmlns:s="clr-namespace:ExpiryTracker.App.Resources.Strings"
+             x:Class="ExpiryTracker.App.Views.RemindersPage"
+             x:DataType="vm:RemindersViewModel"
+             Title="{x:Static s:AppResources.Reminders_Title}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Big, clear header -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,8" Spacing="4" BackgroundColor="{StaticResource UseSoon}">
+            <Label Text="{x:Static s:AppResources.Reminders_Heading}" TextColor="White" FontFamily="OpenSansSemibold" FontSize="28" />
+            <Label Text="{x:Static s:AppResources.Reminders_Sub}" TextColor="White" FontSize="18" />
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16,12" Spacing="12">
+                <Label Text="{x:Static s:AppResources.Reminders_AllDone}" IsVisible="{Binding AllDone}"
+                       Style="{StaticResource Heading}" HorizontalTextAlignment="Center" Margin="0,24" />
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Due}" Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ItemCard">
+                            <Border Style="{StaticResource Card}">
+                                <Grid ColumnDefinitions="10,*" >
+                                    <BoxView Grid.Column="0" Color="{Binding StatusColor}" />
+                                    <VerticalStackLayout Grid.Column="1" Padding="14,12" Spacing="8">
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                            <Border IsVisible="{Binding HasPhoto}" StrokeThickness="0" StrokeShape="RoundRectangle 10" WidthRequest="80" HeightRequest="80">
+                                                <Image Source="{Binding Photo}" Aspect="AspectFill" />
+                                            </Border>
+                                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                                <Label Text="{Binding Name}" FontFamily="OpenSansSemibold" FontSize="23" />
+                                                <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontFamily="OpenSansSemibold" FontSize="19" />
+                                                <Label Text="{Binding Details}" Style="{StaticResource Subtle}" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                            <Button Text="{x:Static s:AppResources.Item_UsedUp}" BackgroundColor="{StaticResource Fresh}" TextColor="White" HeightRequest="60" FontSize="19"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RemindersViewModel}}, Path=UsedUpCommand, x:DataType=vm:RemindersViewModel}"
+                                                    CommandParameter="{Binding .}" />
+                                            <Button Grid.Column="1" Text="{x:Static s:AppResources.Item_Thrown}" BackgroundColor="{StaticResource Expired}" TextColor="White" HeightRequest="60" FontSize="19"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RemindersViewModel}}, Path=ThrownCommand, x:DataType=vm:RemindersViewModel}"
+                                                    CommandParameter="{Binding .}" />
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Snooze and done -->
+        <VerticalStackLayout Grid.Row="2" Padding="16,8,16,16" Spacing="8">
+            <Label Text="{x:Static s:AppResources.Reminders_RemindAgain}" Style="{StaticResource Subtle}" IsVisible="{Binding HasDue}" />
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8" IsVisible="{Binding HasDue}">
+                <Button Text="{x:Static s:AppResources.Reminders_InHour}" Command="{Binding SnoozeHourCommand}" Style="{StaticResource OutlineButton}" />
+                <Button Grid.Column="1" Text="{x:Static s:AppResources.Reminders_Evening}" Command="{Binding SnoozeEveningCommand}" Style="{StaticResource OutlineButton}"
+                        IsEnabled="{Binding EveningAhead}" />
+                <Button Grid.Column="2" Text="{x:Static s:AppResources.Reminders_Tomorrow}" Command="{Binding TomorrowCommand}" Style="{StaticResource OutlineButton}" />
+            </Grid>
+            <Button Text="{x:Static s:AppResources.Reminders_Done}" Command="{Binding DoneCommand}" FontSize="22" HeightRequest="64" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

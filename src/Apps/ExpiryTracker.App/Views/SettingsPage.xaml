@@ -52,7 +52,7 @@
                 </Grid>
             </Border>
 
-            <Border Style="{StaticResource Card}" Padding="14" IsVisible="{x:Static services:Features.Medicines}">
+            <Border Style="{StaticResource Card}" Padding="14">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <Label Text="{x:Static s:AppResources.Settings_OnTime}" VerticalOptions="Center" />
                     <Label Grid.Column="1" Text="{x:Static s:AppResources.Settings_Done}" TextColor="{StaticResource Fresh}"
@@ -66,6 +66,21 @@
                     </Button>
                 </Grid>
             </Border>
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="{x:Static s:AppResources.Settings_FullScreen}" VerticalOptions="Center" />
+                <Switch Grid.Column="1" IsToggled="{Binding FullScreen}" OnColor="{StaticResource Primary}" />
+            </Grid>
+            <Border Style="{StaticResource Card}" Padding="14" IsVisible="{Binding FullScreenNeedsPermission}">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Label Text="{x:Static s:AppResources.Settings_FullScreenPermission}" VerticalOptions="Center" />
+                    <Button Grid.Column="1" Text="{x:Static s:AppResources.Settings_Fix}" Command="{Binding FixFullScreenCommand}" VerticalOptions="Center" />
+                </Grid>
+            </Border>
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="{x:Static s:AppResources.Settings_ReadAloud}" VerticalOptions="Center" />
+                <Switch Grid.Column="1" IsToggled="{Binding ReadAloud}" OnColor="{StaticResource Primary}" />
+            </Grid>
 
             <Label Text="{x:Static s:AppResources.Settings_SamsungTip}" Style="{StaticResource Subtle}" />
             <Button Text="{x:Static s:AppResources.Settings_OpenAppSettings}" Command="{Binding OpenAppSettingsCommand}" Style="{StaticResource OutlineButton}" />

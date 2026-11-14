@@ -27,6 +27,20 @@ public sealed class AppSettings
         set => Preferences.Default.Set(LastUpdateCheckKey, value?.ToUnixTimeMilliseconds() ?? 0L);
     }
 
+    /// <summary>Show the daily reminder full screen (over the lock screen), like an alarm clock. On by default.</summary>
+    public bool FullScreenReminders
+    {
+        get => Preferences.Default.Get("reminder.fullScreen", true);
+        set => Preferences.Default.Set("reminder.fullScreen", value);
+    }
+
+    /// <summary>Read the reminder aloud with the phone's own voice. Off by default.</summary>
+    public bool ReadAloud
+    {
+        get => Preferences.Default.Get("reminder.readAloud", false);
+        set => Preferences.Default.Set("reminder.readAloud", value);
+    }
+
     public bool WelcomeShown
     {
         get => Preferences.Default.Get(WelcomeShownKey, false);

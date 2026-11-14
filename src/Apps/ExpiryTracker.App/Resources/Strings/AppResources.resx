@@ -310,7 +310,7 @@ Also works without backup: on the new phone, Homes → Join a home, and take a p
   <data name="Dose_MissedText" xml:space="preserve"><value>The {0} dose was not marked as taken. Your family has been told.</value></data>
   <data name="Family_MissedTitle" xml:space="preserve"><value>{0} missed a dose</value></data>
   <data name="Family_MissedText" xml:space="preserve"><value>{0} at {1} was not taken ({2}).</value></data>
-  <data name="Settings_OnTime" xml:space="preserve"><value>Medicine alarms on time</value></data>
+  <data name="Settings_OnTime" xml:space="preserve"><value>Reminders on time (Alarms &amp; reminders)</value></data>
   <data name="Unit_tablet" xml:space="preserve"><value>tablet</value></data>
   <data name="Unit_tablet_Many" xml:space="preserve"><value>tablets</value></data>
   <data name="Unit_capsule" xml:space="preserve"><value>capsule</value></data>
@@ -326,4 +326,18 @@ Also works without backup: on the new phone, Homes → Join a home, and take a p
   <data name="Unit_injection" xml:space="preserve"><value>injection</value></data>
   <data name="Unit_injection_Many" xml:space="preserve"><value>injections</value></data>
   <data name="Meds_NotificationsOff" xml:space="preserve"><value>Notifications are off, so medicine reminders can&apos;t ring. Tap Fix and allow notifications.</value></data>
+  <data name="Reminder_SnoozeHour" xml:space="preserve"><value>In 1 hour</value></data>
+  <data name="Reminder_Again" xml:space="preserve"><value>Still waiting – {0}</value></data>
+  <data name="Reminders_Title" xml:space="preserve"><value>Reminder</value></data>
+  <data name="Reminders_Heading" xml:space="preserve"><value>Needs your attention</value></data>
+  <data name="Reminders_Sub" xml:space="preserve"><value>Use these soon, or mark what is finished.</value></data>
+  <data name="Reminders_AllDone" xml:space="preserve"><value>All done ✓</value></data>
+  <data name="Reminders_RemindAgain" xml:space="preserve"><value>Remind me again:</value></data>
+  <data name="Reminders_InHour" xml:space="preserve"><value>1 hour</value></data>
+  <data name="Reminders_Evening" xml:space="preserve"><value>Evening</value></data>
+  <data name="Reminders_Tomorrow" xml:space="preserve"><value>Tomorrow</value></data>
+  <data name="Reminders_Done" xml:space="preserve"><value>Done – I have seen it</value></data>
+  <data name="Settings_FullScreen" xml:space="preserve"><value>Show reminders full screen</value></data>
+  <data name="Settings_FullScreenPermission" xml:space="preserve"><value>Allow “full-screen notifications” so the reminder can show like an alarm clock.</value></data>
+  <data name="Settings_ReadAloud" xml:space="preserve"><value>Read reminders aloud</value></data>
 </root>

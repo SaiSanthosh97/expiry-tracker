@@ -501,7 +501,18 @@ Many people keep dozens of uncleared notifications, so a dose reminder must not 
 | 7 | Pill icon and colour so it is recognisable among other apps' notifications | To build |
 | 8 | Samsung setup screen: Alarms & reminders, Unrestricted battery, lock-screen notifications shown | Partly built (Settings) |
 
-Expiry reminders stay quiet (once a day, normal priority) so they don't train people to ignore the medicine alarm.
+## Expiry reminders that stand out (v0.8.0, built)
+
+At the daily reminder time, when something needs attention:
+
+- **Full-screen "Needs your attention" screen** over the lock screen (like an alarm clock) with each item's photo, name and status and big **Used up / Thrown away** buttons. While the phone is in use Android pops it up at the top instead. Needs "full-screen notifications" on Android 14+ (Settings → Fix). Can be turned off in Settings.
+- **Own channel with an alarm-like tone, strong vibration, the app's colour**; can't be swiped away until handled.
+- **Snooze:** 1 hour, this evening (7 PM), or tomorrow – on the notification and on the screen.
+- **Evening repeat** at 7 PM ("Still waiting – …") if nothing was done; skipped once handled (an item marked, snoozed to tomorrow, or "Done").
+- **Read aloud** (optional, off by default) with the phone's own text-to-speech.
+- **On time:** with "Alarms & reminders" allowed the reminder and snoozes ring on the minute; without it, within 10 minutes (plain inexact alarms could be up to an hour late).
+
+The medicine plan above will reuse the same full-screen screen and settings.
 
 
 ---

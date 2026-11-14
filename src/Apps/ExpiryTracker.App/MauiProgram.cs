@@ -89,6 +89,8 @@ public static class MauiProgram
 		services.AddTransient<FamilyPage>();
 		services.AddTransient<HomesViewModel>();
 		services.AddTransient<HomesPage>();
+		services.AddTransient<RemindersViewModel>();
+		services.AddTransient<RemindersPage>();
 		services.AddSingleton<MedicinesViewModel>();
 		services.AddSingleton<MedicinesPage>();
 		services.AddTransient<MedicineEditViewModel>();
@@ -107,7 +109,8 @@ public static class MauiProgram
 				Resource.Drawable.notification_icon,
 				AppResources.Reminder_UsedUp,
 				AppResources.Reminder_Thrown,
-				AppResources.Reminder_Tomorrow));
+				AppResources.Reminder_Tomorrow,
+				AppResources.Reminder_SnoozeHour));
 
 		// Medicine doses: on-time alarm, Taken / Later / Skip, missed after an hour.
 		var doses = app.Services.GetRequiredService<DoseEngine>();

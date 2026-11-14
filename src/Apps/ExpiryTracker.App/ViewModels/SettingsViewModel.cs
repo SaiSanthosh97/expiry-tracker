@@ -24,6 +24,19 @@ public sealed partial class SettingsViewModel(
     [ObservableProperty]
     public partial bool BatteryOk { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FullScreenNeedsPermission))]
+    public partial bool FullScreen { get; set; } = settings.FullScreenReminders;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FullScreenNeedsPermission))]
+    public partial bool FullScreenAllowed { get; set; } = true;
+
+    public bool FullScreenNeedsPermission => FullScreen && !FullScreenAllowed;
+
+    [ObservableProperty]
+    public partial bool ReadAloud { get; set; } = settings.ReadAloud;
+
     /// <summary>Medicine alarms may ring on the minute ("Alarms &amp; reminders").</summary>
     [ObservableProperty]
     public partial bool OnTimeOk { get; set; }
@@ -35,7 +48,21 @@ public sealed partial class SettingsViewModel(
     {
         NotificationsOk = health.NotificationsEnabled;
         BatteryOk = health.BatteryUnrestricted;
+        FullScreenAllowed = HomeTracker.Device.Reminders.DailyReminders.CanShowFullScreen;
         OnTimeOk = HomeTracker.Device.Reminders.TimedReminders.CanRingOnTime;
+    }
+
+    partial void OnFullScreenChanged(bool value) => settings.FullScreenReminders = value;
+
+    partial void OnReadAloudChanged(bool value) => settings.ReadAloud = value;
+
+    [RelayCommand]
+    private void FixFullScreen()
+    {
+        if (Platform.CurrentActivity is { } activity)
+        {
+            HomeTracker.Device.Reminders.DailyReminders.OpenFullScreenSettings(activity);
+        }
     }
 
     partial void OnReminderTimeChanged(TimeSpan value)

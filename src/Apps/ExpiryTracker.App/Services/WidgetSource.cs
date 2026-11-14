@@ -48,6 +48,10 @@ public sealed class WidgetSource(ItemService items, HomeService homes, UndoServi
 public static class WidgetNavigation
 {
     private static HomeWidgetOpenRequest? _pending;
+    private static string? _pendingRoute;
+
+    /// <summary>Set by the activity while it is shown over the lock screen; called when that screen closes.</summary>
+    public static Action? ReleaseLockScreen { get; set; }
 
     public static void Request(HomeWidgetOpenRequest request)
     {
@@ -58,10 +62,33 @@ public static class WidgetNavigation
         }
     }
 
+    /// <summary>Opens a screen by route (e.g. "reminders" from the reminder notification).</summary>
+    public static void RequestRoute(string route)
+    {
+        _pendingRoute = route;
+        if (Shell.Current is not null)
+        {
+            MainThread.BeginInvokeOnMainThread(() => _ = GoAsync());
+        }
+    }
+
     /// <summary>Called when the home screen appears, for requests that arrived before the app was ready.</summary>
     public static async Task GoAsync()
     {
-        if (_pending is not { } request || Shell.Current is null)
+        if (Shell.Current is null)
+        {
+            return;
+        }
+
+        if (_pendingRoute is { } route)
+        {
+            _pendingRoute = null;
+            await Shell.Current.Navigation.PopToRootAsync(false);
+            await Shell.Current.GoToAsync(route);
+            return;
+        }
+
+        if (_pending is not { } request)
         {
             return;
         }

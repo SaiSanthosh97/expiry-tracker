@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content.PM;
 using Android.OS;
 
@@ -19,11 +19,35 @@ public class MainActivity : MauiAppCompatActivity
 		OpenFromWidget(intent);
 	}
 
-	private static void OpenFromWidget(Android.Content.Intent? intent)
+	private void OpenFromWidget(Android.Content.Intent? intent)
 	{
 		if (HomeTracker.Device.HomeWidget.HomeWidget.TakeOpenRequest(intent) is { } request)
 		{
 			ExpiryTracker.App.Services.WidgetNavigation.Request(request);
+		}
+
+		if (intent?.GetBooleanExtra(HomeTracker.Device.Reminders.DailyReminders.ExtraOpen, false) == true)
+		{
+			if (intent.GetBooleanExtra(HomeTracker.Device.Reminders.DailyReminders.ExtraFullScreen, false) && OperatingSystem.IsAndroidVersionAtLeast(27))
+			{
+				// Like an alarm clock: shown over the lock screen, only while the reminder screen is open.
+				SetShowWhenLocked(true);
+				SetTurnScreenOn(true);
+				ExpiryTracker.App.Services.WidgetNavigation.ReleaseLockScreen = () =>
+				{
+					if (OperatingSystem.IsAndroidVersionAtLeast(27))
+					{
+						SetShowWhenLocked(false);
+						SetTurnScreenOn(false);
+					}
+
+					ExpiryTracker.App.Services.WidgetNavigation.ReleaseLockScreen = null;
+				};
+			}
+
+			intent.RemoveExtra(HomeTracker.Device.Reminders.DailyReminders.ExtraOpen);
+			intent.RemoveExtra(HomeTracker.Device.Reminders.DailyReminders.ExtraFullScreen);
+			ExpiryTracker.App.Services.WidgetNavigation.RequestRoute("reminders");
 		}
 	}
 }
