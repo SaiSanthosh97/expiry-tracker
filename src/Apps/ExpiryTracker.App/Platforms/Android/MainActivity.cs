@@ -26,6 +26,12 @@ public class MainActivity : MauiAppCompatActivity
 			ExpiryTracker.App.Services.WidgetNavigation.Request(request);
 		}
 
+		if (intent?.GetBooleanExtra(ExpiryTracker.App.Services.UpdateService.ExtraOpenUpdate, false) == true)
+		{
+			intent.RemoveExtra(ExpiryTracker.App.Services.UpdateService.ExtraOpenUpdate);
+			ExpiryTracker.App.Services.UpdateService.RequestOpen();
+		}
+
 		if (intent?.GetBooleanExtra(HomeTracker.Device.Reminders.DailyReminders.ExtraOpen, false) == true)
 		{
 			if (intent.GetBooleanExtra(HomeTracker.Device.Reminders.DailyReminders.ExtraFullScreen, false) && OperatingSystem.IsAndroidVersionAtLeast(27))

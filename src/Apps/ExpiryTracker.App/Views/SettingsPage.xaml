@@ -101,7 +101,6 @@
             <Label Text="{x:Static s:AppResources.About_Disclaimer}" />
             <Label Text="{x:Static s:AppResources.About_Privacy}" Style="{StaticResource Subtle}" />
             <Label Text="{x:Static s:AppResources.About_License}" Style="{StaticResource Subtle}" />
-            <Button Text="{x:Static s:AppResources.About_SourceCode}" Command="{Binding OpenSourceCodeCommand}" Style="{StaticResource OutlineButton}" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

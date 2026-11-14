@@ -159,9 +159,6 @@ public sealed partial class SettingsViewModel(
     [RelayCommand]
     private Task OpenFamilyAsync() => Shell.Current.GoToAsync("homes");
 
-    [RelayCommand]
-    private Task OpenSourceCodeAsync() => Launcher.Default.OpenAsync(UpdateService.RepositoryUrl);
-
     public static async Task OfferUpdateAsync(AvailableUpdate update, Dialogs dialogs)
     {
         var download = await dialogs.ConfirmAsync(

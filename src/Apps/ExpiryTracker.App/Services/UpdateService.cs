@@ -3,9 +3,21 @@ using HomeTracker.Core.AppUpdater;
 
 namespace ExpiryTracker.App.Services;
 
-/// <summary>Checks GitHub Releases for a newer APK. Automatic checks run at most once a day and only on Wi-Fi.</summary>
-public sealed class UpdateService(HttpClient http, AppSettings settings, Clock clock)
+/// <summary>
+/// Checks GitHub Releases for a newer APK. Automatic checks run at most once a day and only on Wi-Fi:
+/// when the app opens (a pop-up) and in the background (a notification, once per new version).
+/// </summary>
+public sealed class UpdateService(HttpClient http, AppSettings settings, Clock clock, Dialogs dialogs)
 {
+    /// <summary>Put on the launch intent by the "update available" notification.</summary>
+    public const string ExtraOpenUpdate = "hometracker.update.open";
+
+    private const string BackgroundCheckKey = "update.backgroundCheck";
+    private const string NotifiedVersionKey = "update.notifiedVersion";
+
+    private static bool _openRequested;
+    private static Version? _offered;
+
     private const string ApkMimeType = "application/vnd.android.package-archive";
 
     public const string Owner = "SaiSanthosh97";
@@ -75,12 +87,107 @@ public sealed class UpdateService(HttpClient http, AppSettings settings, Clock c
         return update;
     }
 
+    private static bool OnWifi =>
+        Connectivity.Current.NetworkAccess == NetworkAccess.Internet
+        && Connectivity.Current.ConnectionProfiles.Contains(ConnectionProfile.WiFi);
+
+    /// <summary>
+    /// Background job: once a day on Wi-Fi, shows "Update available" as a notification, once for each new version,
+    /// so people hear about it without opening the app.
+    /// </summary>
+    public async Task NotifyIfAvailableAsync(CancellationToken cancellationToken)
+    {
+        var last = Preferences.Default.Get(BackgroundCheckKey, 0L);
+        if (!OnWifi || clock.Now.ToUnixTimeMilliseconds() - last < (long)TimeSpan.FromDays(1).TotalMilliseconds)
+        {
+            return;
+        }
+
+        AvailableUpdate? update;
+        try
+        {
+            update = await _checker.CheckAsync(CurrentVersion).WaitAsync(cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return;
+        }
+
+        Preferences.Default.Set(BackgroundCheckKey, clock.Now.ToUnixTimeMilliseconds());
+        var version = update?.Version.ToString(3);
+        if (update is null || Preferences.Default.Get(NotifiedVersionKey, "") == version)
+        {
+            return;
+        }
+
+        Preferences.Default.Set(NotifiedVersionKey, version);
+        HomeTracker.Device.Reminders.DailyReminders.ShowMessage(
+            "app-update",
+            AppResources.Update_AvailableTitle,
+            string.Format(AppResources.Update_NotificationText, version),
+            ExtraOpenUpdate);
+    }
+
+    /// <summary>The "update available" notification was tapped: offer the update as soon as the app is ready.</summary>
+    public static void RequestOpen()
+    {
+        _openRequested = true;
+        if (Shell.Current is not null)
+        {
+            MainThread.BeginInvokeOnMainThread(() => _ = IPlatformApplication.Current!.Services.GetRequiredService<UpdateService>().OfferIfRequestedAsync());
+        }
+    }
+
+    /// <summary>Called when the home screen appears, for a notification tap that arrived before the app was ready.</summary>
+    public async Task OfferIfRequestedAsync()
+    {
+        if (!_openRequested || Shell.Current is null)
+        {
+            return;
+        }
+
+        _openRequested = false;
+        AvailableUpdate? update;
+        try
+        {
+            update = await CheckNowAsync();
+        }
+        catch (HttpRequestException)
+        {
+            await dialogs.AlertAsync(AppResources.Settings_Updates, AppResources.Update_Failed);
+            return;
+        }
+        catch (TaskCanceledException)
+        {
+            await dialogs.AlertAsync(AppResources.Settings_Updates, AppResources.Update_Failed);
+            return;
+        }
+
+        if (update is null)
+        {
+            await dialogs.AlertAsync(AppResources.Settings_Updates, AppResources.Update_None);
+            return;
+        }
+
+        await OfferAsync(update);
+    }
+
+    /// <summary>Shows the "Update available" question, at most once per version while the app is open.</summary>
+    public async Task OfferAsync(AvailableUpdate update)
+    {
+        if (_offered == update.Version)
+        {
+            return;
+        }
+
+        _offered = update.Version;
+        await ViewModels.SettingsViewModel.OfferUpdateAsync(update, dialogs);
+    }
+
     /// <returns>An update, or null when not due, not on Wi-Fi, offline or up to date.</returns>
     public async Task<AvailableUpdate?> CheckIfDueAsync()
     {
-        var onWifi = Connectivity.Current.NetworkAccess == NetworkAccess.Internet
-            && Connectivity.Current.ConnectionProfiles.Contains(ConnectionProfile.WiFi);
-        if (!onWifi || settings.LastUpdateCheck is { } last && clock.Now - last < TimeSpan.FromDays(1))
+        if (!OnWifi || settings.LastUpdateCheck is { } last && clock.Now - last < TimeSpan.FromDays(1))
         {
             return null;
         }

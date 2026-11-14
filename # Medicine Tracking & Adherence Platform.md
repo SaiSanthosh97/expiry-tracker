@@ -190,6 +190,8 @@ One-tap close, edit any field, Undo for 10 seconds.
 
 App checks GitHub Releases (at most once a day, only on Wi-Fi) → "New version available" → **Update** downloads and opens the installer. Android will ask once to allow installing from this app.
 
+Since v0.8.1 the background job (about every 15 minutes, now always on) also checks once a day on Wi-Fi and shows a normal notification, **"Update available – Version X of Use It Before is ready. Tap to update."**, once for each new version, even if the app isn't opened. Tapping it opens the app and shows the same "Update available" question. The pop-up on opening the app still works as before; the app never shows the same question twice while open.
+
 ---
 
 # Wi-Fi Sync Design (no server)
@@ -294,6 +296,8 @@ Think of each **home** as a **WhatsApp group** with its own list.
 | **3.1 New phone + photos** (v0.5.0) | Photos shared with family through the relay (encrypted files, re-requested if missed); Android backup to the user's Google account (encrypted with the screen lock) and Smart Switch transfer; a restored phone gets a new identity and tells the family which phone it replaces; "Moving to a new phone?" guide; a newly joined phone keeps asking for the list until it arrives |
 | **3.2 Several homes** (v0.6.0) | Homes screen (create, join, open, remove), "All homes" view on the main screen with each item's home, choose the home when adding, "added by" on items, person's name instead of phone name, Refresh button and pull-to-refresh. Membership is per person: each person joins the homes they want to see |
 | **4. Medicines (Module 2)** (v0.7.0, **hidden since v0.7.1**) | Done: Medicines tab; schedules (every day, every other day, chosen weekdays, when needed); dose alarm on the person's phone with TAKEN / LATER / SKIP, again at +10 and +30 min, missed at +60 (or 30 min after Later); exact alarms with "Alarms & reminders"; stock with "buy more" warnings; family sees today's doses and gets missed-dose and refill alerts through the relay. Next: SMS fallback (opt-in), linking a medicine to its strip's expiry |
+| **4.1 Reminders that stand out** (v0.8.0) | Full-screen "Needs your attention" screen, alarm-like channel, snooze 1 hour / evening / tomorrow, 7 PM repeat, read aloud, exact alarms (see "Expiry reminders that stand out") |
+| **4.2 Update notification** (v0.8.1) | "Update available" notification from the background job (daily, Wi-Fi only, once per version); "Source code on GitHub" button removed from Settings → About (the repository stays public because updates download from it) |
 | **5. Windows** | Windows build; ZXing.Net + Windows OCR implementations |
 
 ---
@@ -531,3 +535,10 @@ The medicine plan above will reuse the same full-screen screen and settings.
 
 1. **Medicines reminder window:** longer default (e.g. 30 days) or same 1–2 days?
 2. **After expiry:** remind daily until handled, or only pin on the home screen?
+
+## Decisions (2026-11-15)
+
+- **Items without a printed date:** kept as they are. "No date on it" with a "Good for N days" counter (− / +) is already there; Sweets and Bakery start at 3 days, Milk sweets at 2, Leftovers and Cut fruit at 1. The idea of falling back to 3 days automatically for packaged items (and when the camera finds no date) was offered and **declined** by the owner.
+- **Label reading:** the camera reads EXP / EXPIRY / EX / EX.DT / EXPY / E.D, USE BY, USE BEFORE, BEST BEFORE (END), BB / BBD / BBE, and "best before N months from MFD/PKD" (also "use within", "consume within", "shelf life"). The earliest date wins and the user always confirms it.
+- **Update notification** added (v0.8.1), see Journey I.
+- **"Source code on GitHub" button removed** from the app (v0.8.1). The code stays public under MIT; in-app updates need the public repository.

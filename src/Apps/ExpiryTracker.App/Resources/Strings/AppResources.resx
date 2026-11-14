@@ -115,6 +115,7 @@
   <data name="Update_AvailableText" xml:space="preserve"><value>Version {0} is ready. Download it now?</value></data>
   <data name="Update_InstallHint" xml:space="preserve"><value>Use It Before downloads it and opens Android&apos;s installer: tap Update. Your list is kept. On Samsung, turn off Auto Blocker first (Settings → Security and privacy) and turn it back on afterwards.</value></data>
   <data name="Update_Download" xml:space="preserve"><value>Download</value></data>
+  <data name="Update_NotificationText" xml:space="preserve"><value>Version {0} of Use It Before is ready. Tap to update.</value></data>
   <data name="Update_Later" xml:space="preserve"><value>Later</value></data>
   <data name="Update_None" xml:space="preserve"><value>You have the latest version.</value></data>
   <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates. Check your internet connection.</value></data>
@@ -122,7 +123,6 @@
   <data name="About_Disclaimer" xml:space="preserve"><value>Use It Before only reminds you about dates that you or the pack provide. It does not give medical or food-safety advice. Always follow the label and your doctor or pharmacist.</value></data>
   <data name="About_Privacy" xml:space="preserve"><value>Your list stays on this phone. Photos are read on the phone. A small copy of each product photo is kept inside the app (not in your gallery) and deleted with the item. The list and photos are included in your phone&apos;s Google backup, which Google encrypts with your screen lock. When a photo shows a barcode, only the barcode number is sent to Open Food Facts to find the product name. If you share a home with family, its list and photos go through the free ntfy.sh relay, encrypted so only your family&apos;s phones can read it. The app contacts GitHub on Wi-Fi to check for updates.</value></data>
   <data name="About_License" xml:space="preserve"><value>Free and open source (MIT License).</value></data>
-  <data name="About_SourceCode" xml:space="preserve"><value>Source code on GitHub</value></data>
   <data name="Reminder_Channel" xml:space="preserve"><value>Expiry reminders</value></data>
   <data name="Reminder_ChannelDescription" xml:space="preserve"><value>Tells you before things expire</value></data>
   <data name="Reminder_SingleTitle" xml:space="preserve"><value>{0} – {1}</value></data>

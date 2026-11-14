@@ -78,11 +78,14 @@ public sealed class FamilySyncService
     /// <summary>When this phone last reached the relay for a home, or null.</summary>
     public static DateTimeOffset? LastSync(string homeId) => GetTime("sync.last." + homeId);
 
-    /// <summary>Turns background sync on when at least one home is shared.</summary>
-    public async Task UpdateBackgroundAsync()
+    /// <summary>
+    /// Keeps the background job on. It syncs shared homes and, once a day on Wi-Fi, checks for an app update;
+    /// with no shared home it only does the update check, which costs almost nothing.
+    /// </summary>
+    public Task UpdateBackgroundAsync()
     {
-        var anyShared = (await _homes.GetHomesAsync()).Any(h => h.IsShared);
-        BackgroundWork.SetEnabled(anyShared);
+        BackgroundWork.SetEnabled(true);
+        return Task.CompletedTask;
     }
 
     /// <summary>Syncs every minute while the app is on screen.</summary>

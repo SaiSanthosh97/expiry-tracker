@@ -81,13 +81,20 @@ public static partial class DailyReminders
     /// Shows a separate notification (e.g. "Appa's phone hasn't checked in") without replacing the daily reminder.
     /// The same <paramref name="key"/> replaces its previous notification.
     /// </summary>
-    public static void ShowMessage(string key, string title, string text)
+    /// <param name="openExtra">Optional: a true boolean extra put on the app's launch intent when the message is tapped.</param>
+    public static void ShowMessage(string key, string title, string text, string? openExtra = null)
     {
         var options = Options ?? throw new InvalidOperationException("DailyReminders.Initialize was not called.");
         var context = AppContext;
+        var id = 2000 + (int)((uint)StableHash(key) % 100000);
         var launch = context.PackageManager!.GetLaunchIntentForPackage(context.PackageName!)!;
         launch.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTop);
-        var open = PendingIntent.GetActivity(context, 0, launch, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
+        if (openExtra is not null)
+        {
+            launch.PutExtra(openExtra, true);
+        }
+
+        var open = PendingIntent.GetActivity(context, id, launch, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
 
         var notification = new Notification.Builder(context, ChannelId)
             .SetSmallIcon(options.SmallIconResourceId)
@@ -100,7 +107,7 @@ public static partial class DailyReminders
 
         var manager = (NotificationManager)context.GetSystemService(Context.NotificationService)!;
         // Message notifications use ids from 2000 up, apart from the daily reminder's id.
-        manager.Notify(2000 + (int)((uint)StableHash(key) % 100000), notification);
+        manager.Notify(id, notification);
     }
 
     private static int StableHash(string text)

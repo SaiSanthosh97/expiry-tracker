@@ -118,8 +118,18 @@ public static class MauiProgram
 		// Family sync is created now so it sends medicine changes too.
 		app.Services.GetRequiredService<FamilySyncService>();
 
-		// Family sync in the background (about every 15 minutes, only once a home is shared).
-		BackgroundWork.Initialize(token => app.Services.GetRequiredService<FamilySyncService>().SyncNowAsync(token));
+		// Background job (about every 15 minutes): family sync, and a daily update check that notifies.
+		BackgroundWork.Initialize(async token =>
+		{
+			try
+			{
+				await app.Services.GetRequiredService<FamilySyncService>().SyncNowAsync(token);
+			}
+			finally
+			{
+				await app.Services.GetRequiredService<UpdateService>().NotifyIfAvailableAsync(token);
+			}
+		});
 
 		// Home-screen widget: redrawn whenever the list changes.
 		HomeWidget.Initialize(

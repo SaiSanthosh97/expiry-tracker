@@ -36,6 +36,7 @@ public partial class HomePage : ContentPage
             await RunStartupAsync();
         }
 
+        await _updates.OfferIfRequestedAsync();
         await WidgetNavigation.GoAsync();
     }
 
@@ -69,7 +70,7 @@ public partial class HomePage : ContentPage
 
         if (await _updates.CheckIfDueAsync() is { } update)
         {
-            await SettingsViewModel.OfferUpdateAsync(update, _dialogs);
+            await _updates.OfferAsync(update);
         }
     }
 }
